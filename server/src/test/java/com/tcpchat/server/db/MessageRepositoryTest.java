@@ -49,6 +49,9 @@ class MessageRepositoryTest {
                     "ch CHAR(1) NOT NULL, " +
                     "frequency INT NOT NULL" +
                     ");");
+
+            stmt.execute("DELETE FROM char_frequencies;");
+            stmt.execute("DELETE FROM messages;");
         } finally {
             dbManager.releaseConnection(conn);
         }
