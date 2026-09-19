@@ -39,6 +39,8 @@ class FileRepositoryTest {
                     "status VARCHAR(20) DEFAULT 'SUCCESS', " +
                     "transfer_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                     ");");
+
+            stmt.execute("DELETE FROM file_transfers;");
         } finally {
             dbManager.releaseConnection(conn);
         }
