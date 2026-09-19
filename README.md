@@ -3,7 +3,7 @@
 Dự án ứng dụng Chat và Truyền nhận file (audio, video, hình ảnh) thông qua giao thức TCP/IP bằng Java.
 Ứng dụng sử dụng thuật toán **Caesar Cipher** để mã hóa văn bản, kèm theo cơ chế Heartbeat (Ping/Pong) để duy trì kết nối và quản lý Connection Pool cơ sở dữ liệu để tối ưu hiệu năng.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Ngôn ngữ:** Java 17+ (LTS)
 - **Giao thức:** TCP/IP (java.net.Socket)
