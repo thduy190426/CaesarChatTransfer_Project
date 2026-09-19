@@ -91,4 +91,4 @@ mvn clean test
 ### 2. Kiểm thử chạy kết nối MySQL trực tiếp trong IDE
 1. Đảm bảo dịch vụ MySQL đang chạy và nhập thông tin kết nối đúng trong `server/src/main/resources/db.properties`.
 2. Mở tập tin `server/src/main/java/com/tcpchat/server/TestDatabaseMain.java`.
-3. Nhấn nút **Run** (▶) để chạy trực tiếp phương thức `main()`.
+3. Nhấn nút **Run** để chạy trực tiếp phương thức `main()`.
