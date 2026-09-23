@@ -51,3 +51,16 @@ Thumbs.db
 
 # Project specific temporary files
 extracted_text.txt
+AdvancedKnowledge.txt
+
+# Server Uploads (Bỏ qua thư mục chứa file tải lên của người dùng)
+uploads/
+server/uploads/
+
+# VSCode
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
