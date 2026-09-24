@@ -54,6 +54,11 @@ public class TCPServer {
      * Khởi tạo thread pool và bắt đầu accept loop. Blocking.
      */
     public void start() {
+        if (running) {
+            logger.warn("Server is already running.");
+            return;
+        }
+
         // 1. Tạo ThreadPoolExecutor tường minh
         threadPool = new ThreadPoolExecutor(
                 ServerConfig.CORE_POOL_SIZE,
@@ -61,7 +66,7 @@ public class TCPServer {
                 ServerConfig.THREAD_KEEP_ALIVE_SECONDS,
                 TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(100),
-                new ThreadPoolExecutor.CallerRunsPolicy()
+                new ThreadPoolExecutor.AbortPolicy()
         );
 
         try {
@@ -75,13 +80,21 @@ public class TCPServer {
 
             // 3. Accept loop
             while (running) {
+                Socket clientSocket = null;
                 try {
-                    Socket clientSocket = serverSocket.accept();
+                    clientSocket = serverSocket.accept();
 
                     // Tạo handler cho client mới
                     ClientHandlerThread handler = new ClientHandlerThread(clientSocket, dbManager);
                     threadPool.submit(handler);
 
+                } catch (RejectedExecutionException e) {
+                    logger.warn("Server overload, rejecting connection");
+                    if (clientSocket != null) {
+                        try {
+                            clientSocket.close();
+                        } catch (IOException ignored) {}
+                    }
                 } catch (SocketException e) {
                     // ServerSocket bị close trong shutdown() → bình thường
                     if (running) {
@@ -90,10 +103,15 @@ public class TCPServer {
                 } catch (IOException e) {
                     // Lỗi tạo handler cho 1 client — KHÔNG crash server
                     logger.error("Lỗi khi xử lý client mới: {}", e.getMessage());
+                } catch (Exception e) {
+                    logger.error("Lỗi không mong muốn trong vòng lặp accept: {}", e.getMessage(), e);
                 }
             }
 
         } catch (IOException e) {
+            if (threadPool != null) {
+                threadPool.shutdownNow();
+            }
             logger.error("Không thể bind port {}: {}", port, e.getMessage());
             throw new RuntimeException("Server không thể khởi động", e);
         } finally {
@@ -144,5 +162,12 @@ public class TCPServer {
      */
     public int getPort() {
         return serverSocket != null ? serverSocket.getLocalPort() : -1;
+    }
+
+    /**
+     * Get the number of active connections.
+     */
+    public int getActiveConnections() {
+        return threadPool != null ? threadPool.getActiveCount() : 0;
     }
 }

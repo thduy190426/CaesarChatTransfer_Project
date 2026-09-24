@@ -14,15 +14,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TCPServerTest {
 
-    private static final String H2_URL = "jdbc:h2:mem:tcp_server_test;DB_CLOSE_DELAY=-1;MODE=MySQL";
     private static final String H2_DRIVER = "org.h2.Driver";
 
     private DatabaseManager dbManager;
+    private String h2Url;
 
     @BeforeEach
     void setUp() throws Exception {
+        h2Url = "jdbc:h2:mem:tcp_server_test_" + java.util.UUID.randomUUID().toString() + ";DB_CLOSE_DELAY=-1;MODE=MySQL";
         dbManager = DatabaseManager.getInstance();
-        dbManager.initPool(H2_URL, "sa", "", H2_DRIVER, 3);
+        dbManager.initPool(h2Url, "sa", "", H2_DRIVER, 3);
 
         Connection conn = dbManager.getConnection();
         try (Statement stmt = conn.createStatement()) {
@@ -93,6 +94,13 @@ class TCPServerTest {
         Socket client = new Socket("localhost", port);
         assertTrue(client.isConnected());
 
+        // Wait for server to pick up connection
+        long endTime = System.currentTimeMillis() + 1000;
+        while (server.getActiveConnections() < 1 && System.currentTimeMillis() < endTime) {
+            Thread.sleep(10);
+        }
+        assertEquals(1, server.getActiveConnections(), "Server did not pick up the connection");
+
         // Gửi key exchange
         PrintWriter out = new PrintWriter(
                 new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8), true);
@@ -132,7 +140,12 @@ class TCPServerTest {
             assertTrue(clients[i].isConnected());
         }
 
-        Thread.sleep(300);
+        // Wait for server to pick up connections
+        long endTime = System.currentTimeMillis() + 1500;
+        while (server.getActiveConnections() < clientCount && System.currentTimeMillis() < endTime) {
+            Thread.sleep(10);
+        }
+        assertEquals(clientCount, server.getActiveConnections(), "Server did not pick up all connections");
 
         // Cleanup
         for (Socket c : clients) {
