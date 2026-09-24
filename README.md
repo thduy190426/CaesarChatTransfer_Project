@@ -52,6 +52,20 @@ Phần cơ sở dữ liệu và lưu trữ dữ liệu phía Server (Server Data
 
 ---
 
+### Phase 3: Server Networking (Trần Minh Đức)
+
+Phần lớp mạng phía Server, xử lý kết nối TCP từ nhiều Client đồng thời:
+
+- **Phân tích JSON (`MessageParser.java`):** Chuyển đổi NDJSON ↔ Java Objects (Message, FilePacket, TextResult) sử dụng Gson.
+- **Cấu hình tập trung (`ServerConfig.java`):** Hằng số Thread Pool, Heartbeat, File Transfer, Shutdown.
+- **TCP Server (`TCPServer.java`):** Kiến trúc ThreadPoolExecutor (core=10, max=50) với bounded queue và AbortPolicy (ngăn domino effect).
+- **Xử lý Client (`ClientHandlerThread.java`):** Vòng lặp xử lý per-client — KEY_EXCHANGE, TEXT (decrypt + frequency + DB), FILE (chunked binary + uploads/), PONG. Stream buffered an toàn chống file corruption.
+- **Heartbeat (`HeartbeatTask.java`):** Server gửi PING mỗi 10s, phát hiện timeout 15s, ngắt zombie connections.
+- **Entry point (`ServerMain.java`):** Khởi tạo DB → uploads → TCPServer, kèm Shutdown Hook.
+- **Anti-domino:** Lỗi ở 1 client không ảnh hưởng client khác hoặc server. File tạm `.tmp` tự xóa khi transfer thất bại.
+
+---
+
 ## Cấu trúc thư mục hiện tại
 
 ```text
