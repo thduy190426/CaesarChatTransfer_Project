@@ -41,7 +41,6 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
 
     // === Socket & I/O ===
     private final Socket socket;
-    private final BufferedReader reader;
     private final PrintWriter writer;
     private final DataInputStream dataIn;
     private final String clientId; // "ip:port" cho logging
@@ -74,9 +73,8 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
         // Tạo streams — thứ tự quan trọng: output trước input để tránh deadlock
         this.writer = new PrintWriter(
                 new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
-        this.reader = new BufferedReader(
-                new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-        this.dataIn = new DataInputStream(socket.getInputStream());
+        BufferedInputStream bufferedStream = new BufferedInputStream(socket.getInputStream());
+        this.dataIn = new DataInputStream(bufferedStream);
 
         // Tạo repositories
         this.messageRepo = new MessageRepository(dbManager);
@@ -99,7 +97,7 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
 
             // 3. Vòng lặp đọc message
             String jsonLine;
-            while (connected && (jsonLine = reader.readLine()) != null) {
+            while (connected && (jsonLine = readLine(dataIn)) != null) {
                 if (jsonLine.isBlank()) {
                     continue; // Bỏ qua dòng trống
                 }
@@ -303,6 +301,26 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
         logger.trace("Client {} PONG received", clientId);
     }
 
+    private String readLine(DataInputStream in) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        boolean hasData = false;
+        try {
+            while (true) {
+                byte b = in.readByte();
+                hasData = true;
+                if (b == '\n') {
+                    break;
+                }
+                if (b != '\r') {
+                    buffer.write(b);
+                }
+            }
+        } catch (EOFException e) {
+            if (!hasData) return null;
+        }
+        return buffer.toString(StandardCharsets.UTF_8);
+    }
+
     // ========== Utility Methods ==========
 
     /**
@@ -396,7 +414,6 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
         clientRepo.updateClientStatus(ip, "DISCONNECTED");
 
         // 3. Đóng streams
-        closeQuietly(reader);
         closeQuietly(dataIn);
         // writer đóng tự động khi socket đóng
 

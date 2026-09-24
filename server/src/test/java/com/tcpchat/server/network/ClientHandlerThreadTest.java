@@ -151,9 +151,6 @@ class ClientHandlerThreadTest {
             keyMsg.setKey(3);
             client.out.println(GSON.toJson(keyMsg));
 
-            // Chờ nhỏ để handler xử lý
-            Thread.sleep(200);
-
             // 2. Gửi TEXT message (cipher text "khoor" with key=3 → "hello")
             Message textMsg = new Message(Protocol.TYPE_TEXT);
             textMsg.setCipherText("khoor");
@@ -204,8 +201,6 @@ class ClientHandlerThreadTest {
             keyMsg.setKey(5);
             client.out.println(GSON.toJson(keyMsg));
 
-            Thread.sleep(200);
-
             // 3. Gửi TEXT hợp lệ
             Message textMsg = new Message(Protocol.TYPE_TEXT);
             textMsg.setCipherText("mjqqt");  // key=5 → "hello"
@@ -248,14 +243,17 @@ class ClientHandlerThreadTest {
             Path uploadDir = Path.of(ServerConfig.UPLOAD_DIR);
             assertTrue(Files.exists(uploadDir), "Thư mục uploads phải tồn tại");
             // Tìm file vừa upload
-            boolean fileFound = Files.list(uploadDir)
-                    .anyMatch(p -> p.getFileName().toString().contains("test_upload"));
+            boolean fileFound;
+            try (java.util.stream.Stream<Path> stream = Files.list(uploadDir)) {
+                fileFound = stream.anyMatch(p -> p.getFileName().toString().contains("test_upload"));
+            }
             assertTrue(fileFound, "File phải được lưu trong thư mục uploads");
 
             // Cleanup
-            Files.list(uploadDir)
-                    .filter(p -> p.getFileName().toString().contains("test_upload"))
-                    .forEach(p -> p.toFile().delete());
+            try (java.util.stream.Stream<Path> stream = Files.list(uploadDir)) {
+                stream.filter(p -> p.getFileName().toString().contains("test_upload"))
+                      .forEach(p -> p.toFile().delete());
+            }
         }
     }
 }
