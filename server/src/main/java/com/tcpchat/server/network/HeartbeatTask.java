@@ -3,6 +3,7 @@ package com.tcpchat.server.network;
 import com.tcpchat.common.Protocol;
 import com.tcpchat.common.model.Message;
 import com.tcpchat.server.config.ServerConfig;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class HeartbeatTask implements Runnable {
     private final HeartbeatTarget target;
 
     public HeartbeatTask(HeartbeatTarget target) {
-        this.target = target;
+        this.target = Objects.requireNonNull(target, "HeartbeatTarget must not be null");
     }
 
     @Override
@@ -56,7 +57,7 @@ public class HeartbeatTask implements Runnable {
         } catch (Exception e) {
             // Heartbeat lỗi không được crash scheduler
             logger.error("Lỗi trong HeartbeatTask cho client {}: {}",
-                    target.getClientId(), e.getMessage());
+                    target.getClientId(), e.getMessage(), e);
         }
     }
 }

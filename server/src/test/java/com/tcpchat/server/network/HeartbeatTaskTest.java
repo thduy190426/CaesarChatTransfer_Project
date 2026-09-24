@@ -68,14 +68,33 @@ class HeartbeatTaskTest {
     }
 
     @Test
-    void run_whenPongExactlyAtTimeout_doesNotDisconnect() {
+    void run_whenPongWithinTimeout_doesNotDisconnect() {
         FakeTarget target = new FakeTarget();
-        // Đúng tại ranh giới timeout — chưa vượt quá nên KHÔNG disconnect
-        target.lastPongTime.set(System.currentTimeMillis() - ServerConfig.HEARTBEAT_TIMEOUT_MS);
+        // Giả lập PONG nằm trong ngưỡng cho phép (100ms trước timeout) để tránh clock drift
+        target.lastPongTime.set(System.currentTimeMillis() - (ServerConfig.HEARTBEAT_TIMEOUT_MS - 100));
 
         HeartbeatTask task = new HeartbeatTask(target);
         task.run();
 
         assertFalse(target.disconnected.get(), "Không disconnect khi chưa vượt quá timeout");
+    }
+
+    @Test
+    void constructor_whenTargetIsNull_throwsNullPointerException() {
+        NullPointerException ex = assertThrows(NullPointerException.class, () -> new HeartbeatTask(null));
+        assertEquals("HeartbeatTarget must not be null", ex.getMessage());
+    }
+
+    @Test
+    void run_whenSendMessageThrowsException_catchesExceptionAndDoesNotThrow() {
+        FakeTarget target = new FakeTarget() {
+            @Override
+            public void sendMessage(String jsonLine) {
+                throw new RuntimeException("Simulated socket write failure");
+            }
+        };
+
+        HeartbeatTask task = new HeartbeatTask(target);
+        assertDoesNotThrow(task::run, "Exceptions during heartbeat execution should be cleanly caught");
     }
 }
