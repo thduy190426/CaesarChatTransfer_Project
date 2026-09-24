@@ -46,6 +46,9 @@ public class MessageParser {
             if (typeElement == null || typeElement.isJsonNull()) {
                 throw new IllegalArgumentException("JSON thiếu trường 'type': " + jsonLine);
             }
+            if (!typeElement.isJsonPrimitive() || !typeElement.getAsJsonPrimitive().isString()) {
+                throw new IllegalArgumentException("Trường 'type' phải là chuỗi hợp lệ: " + jsonLine);
+            }
 
             String type = typeElement.getAsString();
             if (type.isBlank()) {
@@ -53,7 +56,7 @@ public class MessageParser {
             }
 
             return type;
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | IllegalStateException | UnsupportedOperationException e) {
             throw new IllegalArgumentException("JSON không hợp lệ: " + jsonLine, e);
         }
     }
@@ -70,7 +73,11 @@ public class MessageParser {
             throw new IllegalArgumentException("JSON input không được null hoặc rỗng");
         }
         try {
-            return GSON.fromJson(jsonLine, Message.class);
+            Message message = GSON.fromJson(jsonLine, Message.class);
+            if (message == null) {
+                throw new IllegalArgumentException("JSON không hợp lệ (kết quả null): " + jsonLine);
+            }
+            return message;
         } catch (JsonSyntaxException e) {
             throw new IllegalArgumentException("Không thể parse Message từ JSON: " + jsonLine, e);
         }
@@ -88,7 +95,11 @@ public class MessageParser {
             throw new IllegalArgumentException("JSON input không được null hoặc rỗng");
         }
         try {
-            return GSON.fromJson(jsonLine, FilePacket.class);
+            FilePacket packet = GSON.fromJson(jsonLine, FilePacket.class);
+            if (packet == null) {
+                throw new IllegalArgumentException("JSON không hợp lệ (kết quả null): " + jsonLine);
+            }
+            return packet;
         } catch (JsonSyntaxException e) {
             throw new IllegalArgumentException("Không thể parse FilePacket từ JSON: " + jsonLine, e);
         }

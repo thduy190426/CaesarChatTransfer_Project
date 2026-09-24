@@ -52,9 +52,39 @@ class MessageParserTest {
     }
 
     @Test
-    void detectType_emptyString_throwsException() {
+    void detectType_whitespaceOnly_throwsException() {
         assertThrows(IllegalArgumentException.class,
-                () -> MessageParser.detectType(""));
+                () -> MessageParser.detectType("   "));
+    }
+
+    @Test
+    void detectType_objectType_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.detectType("{\"type\":{}}"));
+    }
+
+    @Test
+    void detectType_arrayType_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.detectType("{\"type\":[]}"));
+    }
+
+    @Test
+    void detectType_primitiveNonStringType_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.detectType("{\"type\":123}"));
+    }
+
+    @Test
+    void detectType_blankType_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.detectType("{\"type\":\"   \"}"));
+    }
+
+    @Test
+    void detectType_jsonNullLiteral_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.detectType("null"));
     }
 
     // ===== parseMessage() =====
@@ -83,6 +113,38 @@ class MessageParserTest {
         assertEquals("PONG", msg.getType());
     }
 
+    @Test
+    void parseMessage_nullInput_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseMessage(null));
+    }
+
+    @Test
+    void parseMessage_emptyString_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseMessage(""));
+    }
+
+    @Test
+    void parseMessage_whitespaceOnly_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseMessage("   "));
+    }
+
+    @Test
+    void parseMessage_malformedJson_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseMessage("not valid json {{{"));
+    }
+
+    @Test
+    void parseMessage_jsonNullLiteral_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseMessage("null"));
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseMessage("  null  "));
+    }
+
     // ===== parseFilePacket() =====
 
     @Test
@@ -95,10 +157,42 @@ class MessageParserTest {
         assertEquals("image/jpeg", fp.getMimeType());
     }
 
-    // ===== toJson() roundtrip =====
+    @Test
+    void parseFilePacket_nullInput_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseFilePacket(null));
+    }
 
     @Test
-    void toJson_textResult_roundtripPreservesData() {
+    void parseFilePacket_emptyString_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseFilePacket(""));
+    }
+
+    @Test
+    void parseFilePacket_whitespaceOnly_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseFilePacket("   "));
+    }
+
+    @Test
+    void parseFilePacket_malformedJson_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseFilePacket("not valid json {{{"));
+    }
+
+    @Test
+    void parseFilePacket_jsonNullLiteral_throwsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseFilePacket("null"));
+        assertThrows(IllegalArgumentException.class,
+                () -> MessageParser.parseFilePacket("  null  "));
+    }
+
+    // ===== toJson() =====
+
+    @Test
+    void toJson_textResult_producesValidJson() {
         Map<Character, Integer> freq = new HashMap<>();
         freq.put('H', 1);
         freq.put('E', 1);
