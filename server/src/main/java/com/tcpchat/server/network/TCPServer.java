@@ -103,8 +103,18 @@ public class TCPServer {
                 } catch (IOException e) {
                     // Lỗi tạo handler cho 1 client — KHÔNG crash server
                     logger.error("Lỗi khi xử lý client mới: {}", e.getMessage());
+                    if (clientSocket != null) {
+                        try {
+                            clientSocket.close();
+                        } catch (IOException ignored) {}
+                    }
                 } catch (Exception e) {
                     logger.error("Lỗi không mong muốn trong vòng lặp accept: {}", e.getMessage(), e);
+                    if (clientSocket != null) {
+                        try {
+                            clientSocket.close();
+                        } catch (IOException ignored) {}
+                    }
                 }
             }
 
@@ -169,5 +179,12 @@ public class TCPServer {
      */
     public int getActiveConnections() {
         return threadPool != null ? threadPool.getActiveCount() : 0;
+    }
+
+    /**
+     * Get the total number of tasks scheduled for execution.
+     */
+    public long getTaskCount() {
+        return threadPool != null ? threadPool.getTaskCount() : 0;
     }
 }
