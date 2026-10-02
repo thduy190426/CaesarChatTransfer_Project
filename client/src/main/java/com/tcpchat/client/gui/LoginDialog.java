@@ -13,10 +13,10 @@ public class LoginDialog extends JDialog {
         super(parent, "Kết nối tới Server", true);
         
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20)); // Thêm padding xung quanh
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20)); 
         GridBagConstraints cs = new GridBagConstraints();
         cs.fill = GridBagConstraints.HORIZONTAL;
-        cs.insets = new Insets(10, 10, 10, 10); // Khoảng cách giữa các phần tử
+        cs.insets = new Insets(10, 10, 10, 10); 
 
         JLabel lbTitle = new JLabel("Kết nối Máy Chủ Caesar", SwingConstants.CENTER);
         lbTitle.setFont(lbTitle.getFont().deriveFont(Font.BOLD, 18f));
@@ -51,7 +51,7 @@ public class LoginDialog extends JDialog {
         });
 
         JPanel bp = new JPanel();
-        bp.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20)); // Padding cho nút
+        bp.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20)); 
         bp.add(btnLogin);
         bp.add(btnCancel);
 

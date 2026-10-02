@@ -51,11 +51,11 @@ public class ChatWindow extends JFrame implements MessageListener {
     }
 
     private void initComponents() {
-        // Chat HTML builder
+        
         chatHtml = new StringBuilder();
         chatHtml.append("<html><body style='font-family:\"Segoe UI\",Inter,sans-serif; font-size: 13px; padding: 5px; margin: 0;'>");
 
-        // Chat Area
+        
         chatPane = new JTextPane();
         chatPane.setContentType("text/html");
         chatPane.setEditable(false);
@@ -65,11 +65,11 @@ public class ChatWindow extends JFrame implements MessageListener {
         scrollChat.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         add(scrollChat, BorderLayout.CENTER);
 
-        // Frequency Panel (Bên phải)
+        
         freqPanel = new FrequencyTablePanel();
         add(freqPanel, BorderLayout.EAST);
 
-        // Input Panel (Bên dưới)
+        
         JPanel bottomPanel = new JPanel(new BorderLayout());
 
         JPanel inputPanel = new JPanel(new BorderLayout(10, 10));
@@ -104,7 +104,7 @@ public class ChatWindow extends JFrame implements MessageListener {
 
         bottomPanel.add(inputPanel, BorderLayout.NORTH);
 
-        // Progress Bar cho việc gửi file
+        
         progressBar = new JProgressBar(0, 100);
         progressBar.setStringPainted(true);
         progressBar.setVisible(false);
@@ -125,21 +125,21 @@ public class ChatWindow extends JFrame implements MessageListener {
                 throw new NumberFormatException();
             }
 
-            // Gửi key exchange trước
+            
             connection.sendKeyExchange(key);
 
-            // Mã hóa và gửi text
+            
             String cipher = CaesarCipher.encrypt(text, key);
             connection.sendText(cipher);
 
-            appendHtmlChat("<b>Me (Plain):</b>", text, "#005a9e"); // Xanh đậm
-            appendHtmlChat("<b>Me (Cipher):</b>", cipher, "#0078d4"); // Xanh nhạt
+            appendHtmlChat("<b>Me (Plain):</b>", text, "#005a9e"); 
+            appendHtmlChat("<b>Me (Cipher):</b>", cipher, "#0078d4"); 
             txtInput.setText("");
 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Khóa Caesar phải là số nguyên từ 1 đến 25", "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            appendHtmlChat("<b>Lỗi hệ thống:</b>", e.getMessage(), "#d13438"); // Đỏ
+            appendHtmlChat("<b>Lỗi hệ thống:</b>", e.getMessage(), "#d13438"); 
         }
     }
 
@@ -150,7 +150,7 @@ public class ChatWindow extends JFrame implements MessageListener {
             progressBar.setVisible(true);
             progressBar.setValue(0);
 
-            // Sử dụng SwingWorker để gửi file ở background thread, không làm đơ UI
+            
             SwingWorker<Void, Integer> worker = new SwingWorker<>() {
                 @Override
                 protected Void doInBackground() throws Exception {
@@ -170,10 +170,10 @@ public class ChatWindow extends JFrame implements MessageListener {
                 protected void done() {
                     progressBar.setVisible(false);
                     try {
-                        get(); // Lấy kết quả để ném exception nếu có
-                        appendHtmlChat("<b>Hệ thống:</b>", "Đã gửi file " + file.getName() + " xong, chờ phản hồi...", "#107c10"); // Xanh lá
+                        get(); 
+                        appendHtmlChat("<b>Hệ thống:</b>", "Đã gửi file " + file.getName() + " xong, chờ phản hồi...", "#107c10"); 
                     } catch (Exception e) {
-                        appendHtmlChat("<b>Lỗi gửi file:</b>", e.getMessage(), "#d13438"); // Đỏ
+                        appendHtmlChat("<b>Lỗi gửi file:</b>", e.getMessage(), "#d13438"); 
                     }
                 }
             };
@@ -191,32 +191,32 @@ public class ChatWindow extends JFrame implements MessageListener {
         chatPane.setCaretPosition(chatPane.getDocument().getLength());
     }
 
-    // --- MessageListener methods ---
+    
 
     @Override
     public void onTextResultReceived(TextResult result) {
-        appendHtmlChat("<b>Server (Plain):</b>", result.getPlainText(), "#107c10"); // Xanh lá cây
+        appendHtmlChat("<b>Server (Plain):</b>", result.getPlainText(), "#107c10"); 
         freqPanel.updateFrequency(result.getFrequency());
     }
 
     @Override
     public void onFileAckReceived(FilePacket ack) {
         if ("OK".equals(ack.getStatus())) {
-            appendHtmlChat("<b>Server:</b>", "Đã lưu file tại " + ack.getSavedPath(), "#107c10"); // Xanh lá
+            appendHtmlChat("<b>Server:</b>", "Đã lưu file tại " + ack.getSavedPath(), "#107c10"); 
         } else {
-            appendHtmlChat("<b>Server (Lỗi File):</b>", ack.getStatus(), "#d13438"); // Đỏ
+            appendHtmlChat("<b>Server (Lỗi File):</b>", ack.getStatus(), "#d13438"); 
         }
     }
 
     @Override
     public void onErrorReceived(Message error) {
-        appendHtmlChat("<b>Server (Lỗi):</b>", error.getMessage(), "#d13438"); // Đỏ
+        appendHtmlChat("<b>Server (Lỗi):</b>", error.getMessage(), "#d13438"); 
         JOptionPane.showMessageDialog(this, error.getMessage(), "Lỗi từ Server", JOptionPane.ERROR_MESSAGE);
     }
 
     @Override
     public void onDisconnected() {
-        appendHtmlChat("<b>Hệ thống:</b>", "--- Đã ngắt kết nối khỏi server ---", "#a80000"); // Đỏ sậm
+        appendHtmlChat("<b>Hệ thống:</b>", "--- Đã ngắt kết nối khỏi server ---", "#a80000"); 
         txtInput.setEnabled(false);
     }
 }

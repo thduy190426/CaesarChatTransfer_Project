@@ -14,11 +14,11 @@ public class FileTransferClientTest {
 
     @Test
     public void testSendFileChunking() throws IOException {
-        // Create a dummy file of 16KB
+        
         File tempFile = File.createTempFile("test_transfer", ".dat");
         tempFile.deleteOnExit();
 
-        byte[] dummyData = new byte[16384]; // 16KB
+        byte[] dummyData = new byte[16384]; 
         for(int i=0; i<dummyData.length; i++){
             dummyData[i] = (byte) (i % 256);
         }
@@ -41,7 +41,7 @@ public class FileTransferClientTest {
         assertTrue(outputStr.contains("\"type\":\"FILE\""));
         assertTrue(outputStr.contains("\"fileSize\":16384"));
         
-        // Progress should reach exactly or close to 100%
+        
         assertEquals(100, progressUpdates[0], "Progress should report 100% when finished");
     }
 }

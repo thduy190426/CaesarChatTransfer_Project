@@ -49,7 +49,7 @@ public class FileReceiverHandler {
         
         logger.info("Bắt đầu nhận file: {} ({} bytes)", fileName, fileSize);
 
-        // Lưu bản ghi ban đầu với trạng thái IN_PROGRESS
+        
         long recordId = fileRepo.saveFileTransfer(fileName, fileSize, mimeType, saveFile.getPath(), "IN_PROGRESS");
 
         try (FileOutputStream fos = new FileOutputStream(saveFile)) {
@@ -57,7 +57,7 @@ public class FileReceiverHandler {
             long totalRead = 0;
             
             while (totalRead < fileSize) {
-                // Tính toán số byte cần đọc cho chunk cuối cùng
+                
                 int bytesToRead = (int) Math.min(buffer.length, fileSize - totalRead);
                 int read = in.read(buffer, 0, bytesToRead);
                 
@@ -72,10 +72,10 @@ public class FileReceiverHandler {
             fos.flush();
             logger.info("Đã nhận hoàn tất file: {}", saveFile.getPath());
             
-            // Cập nhật DB
+            
             fileRepo.updateFileTransferStatus(recordId, "SUCCESS");
             
-            // Phản hồi FILE_ACK
+            
             FilePacket ack = new FilePacket(Protocol.TYPE_FILE_ACK);
             ack.setStatus("OK");
             ack.setSavedPath(saveFile.getPath());
@@ -89,7 +89,7 @@ public class FileReceiverHandler {
             }
             fileRepo.updateFileTransferStatus(recordId, "FAILED");
             
-            // Gửi lỗi về
+            
             FilePacket err = new FilePacket(Protocol.TYPE_ERROR);
             err.setStatus("Lỗi khi nhận file: " + e.getMessage());
             try {

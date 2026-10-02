@@ -43,7 +43,7 @@ public class FileReceiverHandlerTest {
 
         String jsonHeader = MessageParser.toJson(header);
         
-        // 5 bytes of data
+        
         byte[] fileData = "Hello".getBytes();
         
         ByteArrayInputStream in = new ByteArrayInputStream(fileData);
@@ -53,12 +53,12 @@ public class FileReceiverHandlerTest {
         
         handler.receiveFile(jsonHeader);
 
-        // Verify output stream has FILE_ACK
+        
         String response = out.toString("UTF-8");
         assertTrue(response.contains("\"type\":\"FILE_ACK\""));
         assertTrue(response.contains("\"status\":\"OK\""));
         
-        // Check if file is saved in uploads directory
+        
         File uploadDir = new File("uploads");
         File[] savedFiles = uploadDir.listFiles((dir, name) -> name.endsWith("_dummy.txt"));
         

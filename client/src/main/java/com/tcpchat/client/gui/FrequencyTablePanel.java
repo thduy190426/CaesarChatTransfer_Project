@@ -19,12 +19,12 @@ public class FrequencyTablePanel extends JPanel {
             }
         };
         table = new JTable(tableModel);
-        table.setRowHeight(25); // Tăng chiều cao hàng để dễ nhìn hơn
+        table.setRowHeight(25); 
         table.getTableHeader().setFont(table.getTableHeader().getFont().deriveFont(Font.BOLD));
         table.getTableHeader().setBackground(new Color(240, 240, 240));
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(250, 0)); // Rộng hơn một chút
+        scrollPane.setPreferredSize(new Dimension(250, 0)); 
         scrollPane.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)), 
                 "Phân tích Tần suất"));
@@ -33,7 +33,7 @@ public class FrequencyTablePanel extends JPanel {
     }
 
     public void updateFrequency(Map<Character, Integer> frequencyMap) {
-        tableModel.setRowCount(0); // Xóa dữ liệu cũ
+        tableModel.setRowCount(0); 
         if (frequencyMap != null) {
             for (Map.Entry<Character, Integer> entry : frequencyMap.entrySet()) {
                 tableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});

@@ -55,7 +55,7 @@ public class ClientHandlerThread implements Runnable {
             while (isRunning) {
                 String line = readLineSafe(in);
                 if (line == null) {
-                    break; // Ngắt kết nối
+                    break; 
                 }
 
                 if (line.trim().isEmpty()) continue;
@@ -75,7 +75,7 @@ public class ClientHandlerThread implements Runnable {
                     case Protocol.TYPE_FILE:
                         logger.info("Nhận yêu cầu chuyển file từ {}", clientIp);
                         FileReceiverHandler fileHandler = new FileReceiverHandler(in, out, clientIp);
-                        fileHandler.receiveFile(line); // Pass JSON header to handler
+                        fileHandler.receiveFile(line); 
                         break;
 
                     case Protocol.TYPE_PONG:
@@ -101,16 +101,16 @@ public class ClientHandlerThread implements Runnable {
                 return;
             }
 
-            // Giải mã
+            
             String plainText = CaesarCipher.decrypt(msg.getCipherText(), msg.getKey());
             
-            // Phân tích tần suất
+            
             Map<Character, Integer> freq = CharFrequencyAnalyzer.analyze(plainText);
             
-            // Lưu vào CSDL
+            
             messageRepo.saveMessage(clientIp, msg.getCipherText(), msg.getKey(), plainText, freq);
 
-            // Gửi kết quả về client
+            
             TextResult result = new TextResult(plainText, freq);
             sendMessage(MessageParser.toJson(result));
 
@@ -126,7 +126,7 @@ public class ClientHandlerThread implements Runnable {
     }
 
     public void checkAlive() {
-        // Nếu sau 30 giây không nhận được PONG thì ngắt kết nối
+        
         if (System.currentTimeMillis() - lastPongTime > 30000) {
             logger.warn("Client {} không phản hồi Heartbeat. Đang ngắt kết nối...", clientSocket.getInetAddress().getHostAddress());
             cleanup(clientSocket.getInetAddress().getHostAddress());
@@ -165,9 +165,7 @@ public class ClientHandlerThread implements Runnable {
         logger.info("Đã ngắt kết nối với client {}", clientIp);
     }
 
-    /**
-     * Đọc từng byte cho đến khi gặp \n. Không dùng BufferedReader để tránh việc đọc lố (buffer over-read) vào dữ liệu binary của File.
-     */
+    
     private String readLineSafe(InputStream in) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int b;
@@ -180,7 +178,7 @@ public class ClientHandlerThread implements Runnable {
             }
         }
         if (buffer.size() == 0 && b == -1) {
-            return null; // EOF
+            return null; 
         }
         return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
     }

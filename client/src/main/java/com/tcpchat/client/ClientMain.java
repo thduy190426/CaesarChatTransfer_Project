@@ -11,10 +11,10 @@ public class ClientMain {
     private static final Logger logger = LoggerFactory.getLogger(ClientMain.class);
 
     public static void main(String[] args) {
-        // Thiết lập Look and Feel của FlatLaf
+        
         try {
             com.formdev.flatlaf.FlatLightLaf.setup();
-            // Đặt phông chữ mặc định đẹp hơn (Inter hoặc Segoe UI)
+            
             UIManager.put("defaultFont", new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14));
         } catch (Exception e) {
             logger.warn("Không thể thiết lập giao diện FlatLaf", e);

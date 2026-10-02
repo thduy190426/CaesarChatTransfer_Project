@@ -12,11 +12,11 @@ public class ServerMain {
         logger.info("Khởi động Caesar Chat Server...");
 
         try {
-            // Khởi tạo Database Pool
+            
             DatabaseManager dbManager = DatabaseManager.getInstance();
             dbManager.initPool();
 
-            // Khởi động TCP Server
+            
             int port = Protocol.PORT;
             if (args.length > 0) {
                 port = Integer.parseInt(args[0]);
@@ -25,7 +25,7 @@ public class ServerMain {
             TCPServer server = new TCPServer(port);
             server.start();
 
-            // Thêm Shutdown Hook để dọn dẹp khi tắt server
+            
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("Đang tắt server...");
                 server.stop();

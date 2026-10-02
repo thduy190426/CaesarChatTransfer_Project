@@ -13,7 +13,7 @@ public class CharFrequencyAnalyzerTest {
         Map<Character, Integer> freq = CharFrequencyAnalyzer.analyze(text);
         
         assertNotNull(freq);
-        assertEquals(3, freq.get('l')); // h, e, l, l, o, (space), w, o, r, l, d, !, (space), 1, 2, 3
+        assertEquals(3, freq.get('l')); 
         assertEquals(2, freq.get('o'));
         assertEquals(2, freq.get(' '));
         assertEquals(1, freq.get('!'));
@@ -30,7 +30,7 @@ public class CharFrequencyAnalyzerTest {
         assertEquals(3, freq.get('l'));
         assertEquals(2, freq.get('o'));
         
-        // Non-letters should not exist
+        
         assertNull(freq.get(' '));
         assertNull(freq.get('!'));
         assertNull(freq.get('1'));

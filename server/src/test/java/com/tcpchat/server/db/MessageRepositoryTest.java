@@ -12,12 +12,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Kiểm thử đơn vị (Unit Test) cho MessageRepository.
- * Đảm bảo mọi câu truy vấn được thực thi chính xác thông qua PreparedStatement.
- *
- * @author Nguyễn Quang Anh (Database & Storage)
- */
+
 class MessageRepositoryTest {
 
     private DatabaseManager dbManager;
@@ -31,7 +26,7 @@ class MessageRepositoryTest {
         dbManager.initPool(H2_URL, "sa", "", H2_DRIVER, 5);
         messageRepository = new MessageRepository(dbManager);
 
-        // Khởi tạo bảng CSDL trong H2
+        
         Connection conn = dbManager.getConnection();
         try (Statement stmt = conn.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS messages (" +

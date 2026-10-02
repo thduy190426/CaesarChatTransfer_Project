@@ -26,7 +26,7 @@ public class FileTransferClient {
             mimeType = "application/octet-stream";
         }
 
-        // Gửi Header
+        
         FilePacket header = new FilePacket(Protocol.TYPE_FILE);
         header.setFileName(file.getName());
         header.setFileSize(fileSize);
@@ -35,7 +35,7 @@ public class FileTransferClient {
         out.write((MessageParser.toJson(header) + "\n").getBytes(StandardCharsets.UTF_8));
         out.flush();
 
-        // Gửi nội dung nhị phân (binary chunks)
+        
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] buffer = new byte[Protocol.CHUNK_SIZE];
             long totalSent = 0;

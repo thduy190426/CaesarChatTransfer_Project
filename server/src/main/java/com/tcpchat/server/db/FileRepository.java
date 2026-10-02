@@ -7,14 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Repository xử lý thông tin nhật ký truyền tải tập tin (File Transfers).
- * <p>
- * <b>Yêu cầu bảo mật:</b> 100% sử dụng {@link PreparedStatement} cho mọi truy vấn SQL.
- * </p>
 
- * @author Nguyễn Quang Anh (Database & Storage)
- */
 public class FileRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(FileRepository.class);
@@ -28,9 +21,7 @@ public class FileRepository {
         this.dbManager = dbManager;
     }
 
-    /**
-     * DTO đại diện cho bản ghi truyền file trong CSDL.
-     */
+    
     public static class FileTransferRecord {
         private long id;
         private String fileName;
@@ -69,16 +60,7 @@ public class FileRepository {
         public void setTransferTime(Timestamp transferTime) { this.transferTime = transferTime; }
     }
 
-    /**
-     * Lưu nhật ký bắt đầu/hoàn tất truyền file.
-     *
-     * @param fileName Tên tập tin
-     * @param fileSize Kích thước tập tin (bytes)
-     * @param mimeType Loại MIME
-     * @param savedPath Đường dẫn lưu file trên máy chủ
-     * @param status   Trạng thái (SUCCESS, FAILED, INTERRUPTED, v.v.)
-     * @return ID bản ghi vừa lưu trong DB, hoặc -1 nếu có lỗi
-     */
+    
     public long saveFileTransfer(String fileName, long fileSize, String mimeType, String savedPath, String status) {
         String sql = "INSERT INTO file_transfers (file_name, file_size, mime_type, saved_path, status) VALUES (?, ?, ?, ?, ?)";
         Connection conn = null;
@@ -115,13 +97,7 @@ public class FileRepository {
         return id;
     }
 
-    /**
-     * Cập nhật trạng thái của bản ghi truyền file (VD: Khi bị đứt mạng hoặc xóa file tạm).
-     *
-     * @param id     File Transfer Record ID
-     * @param status Trạng thái mới
-     * @return true nếu cập nhật thành công
-     */
+    
     public boolean updateFileTransferStatus(long id, String status) {
         String sql = "UPDATE file_transfers SET status = ? WHERE id = ?";
         Connection conn = null;
@@ -146,12 +122,7 @@ public class FileRepository {
         }
     }
 
-    /**
-     * Lấy bản ghi truyền file theo ID.
-     *
-     * @param id Record ID
-     * @return FileTransferRecord hoặc null
-     */
+    
     public FileTransferRecord getFileTransferById(long id) {
         String sql = "SELECT id, file_name, file_size, mime_type, saved_path, status, transfer_time FROM file_transfers WHERE id = ?";
         Connection conn = null;
@@ -187,11 +158,7 @@ public class FileRepository {
         return null;
     }
 
-    /**
-     * Lấy danh sách toàn bộ file transfers.
-     *
-     * @return Danh sách bản ghi FileTransferRecord
-     */
+    
     public List<FileTransferRecord> getAllFileTransfers() {
         String sql = "SELECT id, file_name, file_size, mime_type, saved_path, status, transfer_time FROM file_transfers ORDER BY id DESC";
         List<FileTransferRecord> list = new ArrayList<>();

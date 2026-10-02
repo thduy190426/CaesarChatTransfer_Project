@@ -7,10 +7,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * File Test độc lập có chứa phương thức main() để bạn có thể nhấn "Run" trực tiếp trong VS Code / IDE
- * nhằm kiểm thử kết nối Cơ sở dữ liệu và các hàm DAO của Nguyễn Quang Anh.
- */
+
 public class TestDatabaseMain {
 
     public static void main(String[] args) {
@@ -19,7 +16,7 @@ public class TestDatabaseMain {
         System.out.println("==================================================");
 
         try {
-            // 1. Khởi tạo Database Pool từ db.properties
+            
             DatabaseManager dbManager = DatabaseManager.getInstance();
             dbManager.initPool();
 
@@ -27,13 +24,13 @@ public class TestDatabaseMain {
             System.out.println("-> Kích thước Pool: " + dbManager.getPoolSize());
             System.out.println("-> Số kết nối sẵn sàng (Available): " + dbManager.getAvailableConnections());
 
-            // 2. Thử nghiệm cấp phát connection bằng ArrayBlockingQueue.take()
+            
             Connection conn = dbManager.getConnection();
             System.out.println("-> Lấy thành công Connection bằng take(): " + conn.getMetaData().getURL());
             dbManager.releaseConnection(conn);
             System.out.println("-> Đã hoàn trả Connection về Pool thành công.");
 
-            // 3. Thử nghiệm lưu tin nhắn và bảng tần suất ký tự bằng PreparedStatement
+            
             MessageRepository msgRepo = new MessageRepository(dbManager);
             Map<Character, Integer> freqs = new HashMap<>();
             freqs.put('H', 1);
@@ -59,7 +56,7 @@ public class TestDatabaseMain {
                 System.out.println("-> Lưu tin nhắn thất bại (Vui lòng kiểm tra dịch vụ MySQL trên máy).");
             }
 
-            // Đóng pool
+            
             dbManager.closePool();
             System.out.println("\n=== KIỂM THỬ HOÀN TẤT NGUYÊN VẸN ===");
 

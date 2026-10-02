@@ -76,42 +76,42 @@ class TCPServerTest {
     @Test
     @DisplayName("Server khởi động, accept connection, shutdown sạch sẽ")
     void testStartAcceptAndShutdown() throws Exception {
-        // Dùng port tùy chỉnh để tránh xung đột
-        TCPServer server = new TCPServer(dbManager, 0); // 0 = OS chọn port
+        
+        TCPServer server = new TCPServer(dbManager, 0); 
 
-        // Start server trong thread riêng
+        
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<?> serverFuture = executor.submit(server::start);
 
-        // Chờ server sẵn sàng
+        
         Thread.sleep(500);
         assertTrue(server.isRunning());
 
         int port = server.getPort();
         assertTrue(port > 0, "Server phải bind được port");
 
-        // Connect client
+        
         Socket client = new Socket("localhost", port);
         assertTrue(client.isConnected());
 
-        // Wait for server to pick up connection
+        
         long endTime = System.currentTimeMillis() + 1000;
         while (server.getActiveConnections() < 1 && System.currentTimeMillis() < endTime) {
             Thread.sleep(10);
         }
         assertEquals(1, server.getActiveConnections(), "Server did not pick up the connection");
 
-        // Gửi key exchange
+        
         PrintWriter out = new PrintWriter(
                 new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8), true);
         out.println("{\"type\":\"KEY_EXCHANGE\",\"key\":3}");
         Thread.sleep(200);
 
-        // Cleanup
+        
         client.close();
         server.shutdown();
 
-        // Chờ server dừng
+        
         try {
             serverFuture.get(10, TimeUnit.SECONDS);
         } catch (Exception ignored) {
@@ -134,20 +134,20 @@ class TCPServerTest {
         int clientCount = 5;
         Socket[] clients = new Socket[clientCount];
 
-        // Connect nhiều clients
+        
         for (int i = 0; i < clientCount; i++) {
             clients[i] = new Socket("localhost", port);
             assertTrue(clients[i].isConnected());
         }
 
-        // Wait for server to pick up connections
+        
         long endTime = System.currentTimeMillis() + 1500;
         while (server.getTaskCount() < clientCount && System.currentTimeMillis() < endTime) {
             Thread.sleep(10);
         }
         assertEquals(clientCount, server.getTaskCount(), "Server did not pick up all connections");
 
-        // Cleanup
+        
         for (Socket c : clients) {
             if (c != null && !c.isClosed()) c.close();
         }
@@ -166,7 +166,7 @@ class TCPServerTest {
         Thread.sleep(500);
 
         int port = server.getPort();
-        // ServerConfig.MAX_POOL_SIZE = 50, queue = 100 => Total capacity = 150
+        
         int clientCount = 160; 
         Socket[] clients = new Socket[clientCount];
         
@@ -176,24 +176,24 @@ class TCPServerTest {
         for (int i = 0; i < clientCount; i++) {
             try {
                 clients[i] = new Socket("localhost", port);
-                // Give the server a tiny amount of time to reject
+                
                 Thread.sleep(5); 
                 
-                // If the socket was closed by the server (due to rejection), an IO exception will occur when trying to read/write, 
-                // but we can also just wait and check getTaskCount().
+                
+                
                 successfulConnections++;
             } catch (Exception e) {
                 failedConnections++;
             }
         }
         
-        // Wait for server to process all accepted connections
+        
         Thread.sleep(1500);
         
-        // The server should have at most 150 tasks (max pool size + queue size)
+        
         assertTrue(server.getTaskCount() <= 150, "Task count should not exceed max capacity (150)");
 
-        // Cleanup
+        
         for (Socket c : clients) {
             if (c != null && !c.isClosed()) c.close();
         }

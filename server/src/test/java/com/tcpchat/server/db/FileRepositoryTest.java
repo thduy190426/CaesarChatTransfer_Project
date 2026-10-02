@@ -10,11 +10,7 @@ import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Kiểm thử đơn vị (Unit Test) cho FileRepository.
- *
- * @author Nguyễn Quang Anh (Database & Storage)
- */
+
 class FileRepositoryTest {
 
     private DatabaseManager dbManager;

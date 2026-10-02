@@ -23,7 +23,7 @@ public class TCPServer {
 
     public TCPServer(int port) {
         this.port = port;
-        // Khởi tạo ThreadPool với tối đa 50 threads
+        
         this.threadPool = Executors.newFixedThreadPool(50);
         this.activeClients = new CopyOnWriteArrayList<>();
     }
@@ -34,7 +34,7 @@ public class TCPServer {
             isRunning = true;
             logger.info("TCP Server đang lắng nghe trên cổng: {}", port);
 
-            // Bắt đầu luồng Heartbeat (Ping định kỳ)
+            
             startHeartbeatThread();
 
             while (isRunning) {
@@ -84,7 +84,7 @@ public class TCPServer {
         Thread heartbeatThread = new Thread(() -> {
             while (isRunning) {
                 try {
-                    Thread.sleep(10000); // 10 giây ping 1 lần
+                    Thread.sleep(10000); 
                     for (ClientHandlerThread client : activeClients) {
                         client.sendPing();
                         client.checkAlive();

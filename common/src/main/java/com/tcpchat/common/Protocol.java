@@ -1,14 +1,12 @@
 package com.tcpchat.common;
 
-/**
- * Các hằng số giao thức chung giữa Client và Server.
- */
+
 public class Protocol {
 
     public static final int PORT = 9999;
-    public static final int CHUNK_SIZE = 8192; // 8KB cho truyền tải file
+    public static final int CHUNK_SIZE = 8192; 
 
-    // Loại Message (Message Types)
+    
     public static final String TYPE_KEY_EXCHANGE = "KEY_EXCHANGE";
     public static final String TYPE_TEXT = "TEXT";
     public static final String TYPE_FILE = "FILE";

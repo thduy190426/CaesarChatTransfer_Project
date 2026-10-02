@@ -12,9 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HeartbeatTaskTest {
 
-    /**
-     * Fake implementation of HeartbeatTarget for testing.
-     */
+    
     static class FakeTarget implements HeartbeatTask.HeartbeatTarget {
         final List<String> sentMessages = new ArrayList<>();
         final AtomicBoolean disconnected = new AtomicBoolean(false);
@@ -44,7 +42,7 @@ class HeartbeatTaskTest {
     @Test
     void run_whenPongRecent_sendsPingAndDoesNotDisconnect() {
         FakeTarget target = new FakeTarget();
-        // lastPongTime = now → PONG mới nhận gần đây
+        
         target.lastPongTime.set(System.currentTimeMillis());
 
         HeartbeatTask task = new HeartbeatTask(target);
@@ -58,7 +56,7 @@ class HeartbeatTaskTest {
     @Test
     void run_whenPongTimedOut_disconnectsClient() {
         FakeTarget target = new FakeTarget();
-        // Giả lập PONG cũ hơn timeout threshold
+        
         target.lastPongTime.set(System.currentTimeMillis() - ServerConfig.HEARTBEAT_TIMEOUT_MS - 1000);
 
         HeartbeatTask task = new HeartbeatTask(target);
@@ -70,7 +68,7 @@ class HeartbeatTaskTest {
     @Test
     void run_whenPongWithinTimeout_doesNotDisconnect() {
         FakeTarget target = new FakeTarget();
-        // Giả lập PONG nằm trong ngưỡng cho phép (100ms trước timeout) để tránh clock drift
+        
         target.lastPongTime.set(System.currentTimeMillis() - (ServerConfig.HEARTBEAT_TIMEOUT_MS - 100));
 
         HeartbeatTask task = new HeartbeatTask(target);

@@ -1,10 +1,8 @@
 package com.tcpchat.common.model;
 
-/**
- * Model đại diện cho thông tin file header trước khi gửi byte nhị phân hoặc File ACK.
- */
+
 public class FilePacket {
-    private String type; // Thường là FILE hoặc FILE_ACK
+    private String type; 
     private String fileName;
     private Long fileSize;
     private String mimeType;

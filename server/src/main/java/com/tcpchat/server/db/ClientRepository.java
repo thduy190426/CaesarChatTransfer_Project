@@ -5,14 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
-/**
- * Repository quản lý thông tin các Client đã kết nối vào Hệ thống.
- * <p>
- * <b>Yêu cầu bảo mật:</b> 100% sử dụng {@link PreparedStatement} phòng tránh SQL Injection.
- * </p>
 
- * @author Nguyễn Quang Anh (Database & Storage)
- */
 public class ClientRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientRepository.class);
@@ -26,9 +19,7 @@ public class ClientRepository {
         this.dbManager = dbManager;
     }
 
-    /**
-     * DTO đại diện cho thông tin Client trong CSDL.
-     */
+    
     public static class ClientRecord {
         private int clientId;
         private String ipAddress;
@@ -63,14 +54,7 @@ public class ClientRepository {
         public void setLastActiveAt(Timestamp lastActiveAt) { this.lastActiveAt = lastActiveAt; }
     }
 
-    /**
-     * Thêm mới thông tin Client hoặc cập nhật trạng thái nếu đã tồn tại.
-     *
-     * @param ipAddress IP của Client
-     * @param port      Port của Client
-     * @param status    Trạng thái (CONNECTED, DISCONNECTED, v.v.)
-     * @return true nếu ghi/cập nhật thành công
-     */
+    
     public boolean saveOrUpdateClient(String ipAddress, int port, String status) {
         String insertSql = "INSERT INTO clients (ip_address, port, status) VALUES (?, ?, ?)";
         Connection conn = null;
@@ -96,13 +80,7 @@ public class ClientRepository {
         }
     }
 
-    /**
-     * Cập nhật trạng thái của Client (kết nối / ngắt kết nối).
-     *
-     * @param ipAddress IP Client
-     * @param status    Trạng thái mới
-     * @return true nếu thành công
-     */
+    
     public boolean updateClientStatus(String ipAddress, String status) {
         String sql = "UPDATE clients SET status = ?, last_active_at = CURRENT_TIMESTAMP WHERE ip_address = ?";
         Connection conn = null;
@@ -127,12 +105,7 @@ public class ClientRepository {
         }
     }
 
-    /**
-     * Truy vấn thông tin Client gần nhất theo IP.
-     *
-     * @param ipAddress IP Client
-     * @return ClientRecord hoặc null nếu không tồn tại
-     */
+    
     public ClientRecord getClientByIp(String ipAddress) {
         String sql = "SELECT client_id, ip_address, port, status, connected_at, last_active_at FROM clients WHERE ip_address = ? ORDER BY client_id DESC LIMIT 1";
         Connection conn = null;

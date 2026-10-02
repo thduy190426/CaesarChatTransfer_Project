@@ -9,14 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Repository xử lý các thao tác dữ liệu tin nhắn và tần suất ký tự.
- * <p>
- * <b>Yêu cầu bảo mật:</b> 100% sử dụng {@link PreparedStatement} cho mọi truy vấn SQL để phòng chống tấn công SQL Injection.
- * </p>
 
- * @author Nguyễn Quang Anh (Database & Storage)
- */
 public class MessageRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageRepository.class);
@@ -30,9 +23,7 @@ public class MessageRepository {
         this.dbManager = dbManager;
     }
 
-    /**
-     * DTO chứa dữ liệu Record tin nhắn từ CSDL.
-     */
+    
     public static class MessageRecord {
         private long id;
         private String clientIp;
@@ -67,17 +58,7 @@ public class MessageRepository {
         public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
     }
 
-    /**
-     * Lưu tin nhắn đã mã hóa / giải mã cùng bảng tần suất ký tự vào CSDL.
-     * <p>Thao tác được thực hiện trong 1 Transaction nguyên tố (Atomic Transaction).</p>
-     *
-     * @param clientIp        IP của Client gửi
-     * @param cipherText      Văn bản mã hóa
-     * @param shiftKey        Dịch khóa Caesar (1-25)
-     * @param plainText       Văn bản gốc đã giải mã
-     * @param charFrequencies Map tần suất xuất hiện ký tự
-     * @return ID của tin nhắn vừa tạo trong DB, hoặc -1 nếu thất bại
-     */
+    
     public long saveMessage(String clientIp, String cipherText, int shiftKey, String plainText, Map<Character, Integer> charFrequencies) {
         String insertMessageSql = "INSERT INTO messages (client_ip, cipher_text, shift_key, plain_text) VALUES (?, ?, ?, ?)";
         String insertFreqSql = "INSERT INTO char_frequencies (message_id, ch, frequency) VALUES (?, ?, ?)";
@@ -90,9 +71,9 @@ public class MessageRepository {
 
         try {
             conn = dbManager.getConnection();
-            conn.setAutoCommit(false); // Bắt đầu Transaction
+            conn.setAutoCommit(false); 
 
-            // 1. Lưu bản ghi tin nhắn bằng PreparedStatement
+            
             msgStmt = conn.prepareStatement(insertMessageSql, Statement.RETURN_GENERATED_KEYS);
             msgStmt.setString(1, clientIp);
             msgStmt.setString(2, cipherText);
@@ -111,7 +92,7 @@ public class MessageRepository {
                 throw new SQLException("Lưu tin nhắn thất bại, không lấy được ID tự tăng.");
             }
 
-            // 2. Lưu tần suất ký tự kèm theo tin nhắn bằng PreparedStatement Batching
+            
             if (charFrequencies != null && !charFrequencies.isEmpty()) {
                 freqStmt = conn.prepareStatement(insertFreqSql);
                 for (Map.Entry<Character, Integer> entry : charFrequencies.entrySet()) {
@@ -123,7 +104,7 @@ public class MessageRepository {
                 freqStmt.executeBatch();
             }
 
-            conn.commit(); // Cam kết Transaction
+            conn.commit(); 
             logger.info("Đã lưu tin nhắn thành công với Message ID: {}", messageId);
 
         } catch (Exception e) {
@@ -148,12 +129,7 @@ public class MessageRepository {
         return messageId;
     }
 
-    /**
-     * Tìm kiếm tin nhắn theo ID.
-     *
-     * @param id Message ID
-     * @return MessageRecord hoặc null nếu không tìm thấy
-     */
+    
     public MessageRecord getMessageById(long id) {
         String sql = "SELECT id, client_ip, cipher_text, shift_key, plain_text, created_at FROM messages WHERE id = ?";
         Connection conn = null;
@@ -188,11 +164,7 @@ public class MessageRepository {
         return null;
     }
 
-    /**
-     * Lấy danh sách tất cả tin nhắn đã lưu trong CSDL.
-     *
-     * @return Danh sách các MessageRecord
-     */
+    
     public List<MessageRecord> getAllMessages() {
         String sql = "SELECT id, client_ip, cipher_text, shift_key, plain_text, created_at FROM messages ORDER BY id DESC";
         List<MessageRecord> list = new ArrayList<>();
@@ -227,12 +199,7 @@ public class MessageRepository {
         return list;
     }
 
-    /**
-     * Lấy bảng tần suất ký tự tương ứng với một tin nhắn.
-     *
-     * @param messageId ID tin nhắn
-     * @return Map ký tự -> số lần xuất hiện
-     */
+    
     public Map<Character, Integer> getCharFrequenciesByMessageId(long messageId) {
         String sql = "SELECT ch, frequency FROM char_frequencies WHERE message_id = ?";
         Map<Character, Integer> map = new HashMap<>();

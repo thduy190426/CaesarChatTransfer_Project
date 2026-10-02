@@ -1,14 +1,12 @@
 package com.tcpchat.common.model;
 
-/**
- * Model đại diện cho thông điệp giao tiếp chung giữa Client và Server (Text/Key/Error/Heartbeat).
- */
+
 public class Message {
     private String type;
     private String cipherText;
     private Integer key;
-    private String message; // Cho thông báo lỗi
-    private String status;  // Cho các ACK
+    private String message; 
+    private String status;  
 
     public Message() {
     }

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MessageParserTest {
 
-    // ===== detectType() =====
+    
 
     @Test
     void detectType_textMessage_returnsTextType() {
@@ -87,7 +87,7 @@ class MessageParserTest {
                 () -> MessageParser.detectType("null"));
     }
 
-    // ===== parseMessage() =====
+    
 
     @Test
     void parseMessage_textMessage_parsesCorrectly() {
@@ -145,7 +145,7 @@ class MessageParserTest {
                 () -> MessageParser.parseMessage("  null  "));
     }
 
-    // ===== parseFilePacket() =====
+    
 
     @Test
     void parseFilePacket_validFile_parsesCorrectly() {
@@ -189,7 +189,7 @@ class MessageParserTest {
                 () -> MessageParser.parseFilePacket("  null  "));
     }
 
-    // ===== toJson() =====
+    
 
     @Test
     void toJson_textResult_producesValidJson() {
@@ -203,7 +203,7 @@ class MessageParserTest {
         assertNotNull(json);
         assertTrue(json.contains("HELLO"));
         assertTrue(json.contains("TEXT_RESULT"));
-        // JSON phải nằm trên 1 dòng (NDJSON requirement)
+        
         assertFalse(json.contains("\n"), "JSON output phải là single-line cho NDJSON");
     }
 

@@ -2,11 +2,9 @@ package com.tcpchat.common.model;
 
 import java.util.Map;
 
-/**
- * Model chứa kết quả văn bản đã giải mã kèm tần suất ký tự, gửi từ Server về Client.
- */
+
 public class TextResult {
-    private String type; // Thường là TEXT_RESULT
+    private String type; 
     private String plainText;
     private Map<Character, Integer> frequency;
 

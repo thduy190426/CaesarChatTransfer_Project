@@ -13,12 +13,7 @@ import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Kiểm thử đơn vị (Unit Test) cho lớp DatabaseManager.
- * Thử nghiệm cơ chế cấp phát Connection an toàn bằng ArrayBlockingQueue.take().
- *
- * @author Nguyễn Quang Anh (Database & Storage)
- */
+
 class DatabaseManagerTest {
 
     private DatabaseManager dbManager;
@@ -76,9 +71,9 @@ class DatabaseManagerTest {
             futures.add(executor.submit(() -> {
                 Connection conn = null;
                 try {
-                    conn = dbManager.getConnection(); // Chặn (take) an toàn nếu hết connection
+                    conn = dbManager.getConnection(); 
                     assertNotNull(conn);
-                    Thread.sleep(50); // Mô phỏng thao tác DB
+                    Thread.sleep(50); 
                     return true;
                 } catch (Exception e) {
                     return false;
