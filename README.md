@@ -107,41 +107,7 @@ Hệ thống được trang bị bộ Unit Test chuẩn chỉ để đảm bảo
 
 ---
 
-## BƯỚC 5: HƯỚNG DẪN SỬ DỤNG (USER GUIDE)
-
-1. **Nhắn tin bảo mật (Caesar Cipher):**
-   - Ở cửa sổ Chat, nhìn góc dưới bên trái có ô "Khóa Caesar". Hãy nhập một con số từ 1 đến 25 (Ví dụ: `7`).
-   - Nhập một đoạn văn bản vào ô Text trống dài bên cạnh (Ví dụ: `HELLO WORLD`).
-   - Bấm nút **Gửi Text**.
-   - Client sẽ mã hóa văn bản theo khóa 7 và gửi lên Server. Server giải mã, lưu DB, đếm tần suất và trả kết quả về. Bảng Tần suất (bên phải) sẽ lập tức được cập nhật!
-
-2. **Truyền File:**
-   - Bấm nút **Gửi File**.
-   - Trình duyệt file sẽ mở ra. Hãy chọn một file bất kỳ (ảnh, video, hoặc pdf) trên máy tính của bạn. Khuyến khích chọn file dưới 50MB để test.
-   - Thanh tiến trình (JProgressBar) phía dưới cùng sẽ xuất hiện và trượt từ 0% đến 100%. Màn hình Chat vẫn có thể cuộn bình thường mà không bị đơ.
-   - Khi chạy xong 100%, có thông báo: `Server: Đã lưu file tại uploads/...`
-   
-3. **Kiểm tra dữ liệu (Database Check):**
-   - Mở lại MySQL Workbench và truy vấn:
-     `SELECT * FROM messages;`
-     `SELECT * FROM file_transfers;`
-   - Bạn sẽ thấy toàn bộ lịch sử các giao dịch vừa rồi đã được lưu vết lại chính xác từng thời điểm!
-   - Thư mục `uploads/` sẽ được tự động tạo ra trong thư mục chứa mã nguồn Server, chứa bản sao của các file bạn vừa tải lên.
-
-## Công Nghệ Sử Dụng
-
-- **Ngôn ngữ**: Java 17 LTS
-- **Kết nối Mạng**: `java.net.Socket` và `ServerSocket`
-- **Xử lý Đa luồng**: `java.util.concurrent` (ThreadPoolExecutor, ArrayBlockingQueue)
-- **Thiết kế Giao diện**: Java Swing (JFrame, JDialog, JProgressBar, SwingWorker)
-- **Thao tác JSON**: Google Gson 2.10.1
-- **Truy xuất CSDL**: JDBC thuần với MySQL Connector/J 8.0.33
-- **Lưu Vết (Logging)**: SLF4J đi kèm Logback
-- **Kiểm Thử (Testing)**: JUnit 5
-
-## Cấu Trúc Mã Nguồn (Project Structure)
-
-Dưới đây là sơ đồ kiến trúc thư mục chi tiết, thể hiện rõ ràng các thành phần chức năng, công cụ mã hóa và phân tích của hệ thống:
+## Cấu trúc thư mục hiện tại
 
 ```text
 tcp-caesar-chat/
