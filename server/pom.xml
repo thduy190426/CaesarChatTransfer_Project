@@ -19,6 +19,13 @@
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <!-- SLF4J Binding (Console Log) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </dependency>
+
         <!-- MySQL Connector -->
         <dependency>
             <groupId>com.mysql</groupId>
