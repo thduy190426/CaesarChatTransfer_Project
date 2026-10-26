@@ -4,7 +4,7 @@ Hệ thống Client-Server đa phân hệ (Multi-module) phát triển bằng **
 
 ---
 
-## 🏛️ Kiến Trúc Hệ Thống
+## Kiến Trúc Hệ Thống
 
 Dự án được tổ chức thành 3 phân hệ Maven độc lập:
 
@@ -31,12 +31,12 @@ Dự án được tổ chức thành 3 phân hệ Maven độc lập:
 
 ## 🚀 Tính Năng Chính
 
-* 🔐 **Mã hóa Caesar Cipher**: Mã hóa văn bản với khóa K (1 - 25) trước khi gửi qua mạng. Server giải mã, lưu DB và thống kê tần suất ký tự trả về Client.
-* 📊 **Thống kê tần suất**: Phân tích trực quan tỷ lệ xuất hiện của các ký tự trong chuỗi văn bản.
-* 📁 **Truyền tệp tin nhị phân lớn**: Hỗ trợ gửi file (hình ảnh, tài liệu, video) bằng kỹ thuật chia nhỏ 8KB (chunked streaming), chống tràn bộ nhớ (OOM).
-* 🛡️ **Bảo toàn dữ liệu & Chống SQL Injection**: Toàn bộ thao tác truy vấn CSDL đều dùng `PreparedStatement`.
-* 🧹 **Tự động thu hồi file rác**: Server phát hiện sự cố ngắt kết nối khi đang gửi file, hủy file lỗi và cập nhật trạng thái `FAILED`.
-* 🌐 **Sẵn sàng triển khai đa môi trường**: Chạy được trên cùng 1 máy (Localhost), mạng nội bộ (LAN / Máy ảo) hoặc máy chủ đám mây (Cloud VPS).
+* **Mã hóa Caesar Cipher**: Mã hóa văn bản với khóa K (1 - 25) trước khi gửi qua mạng. Server giải mã, lưu DB và thống kê tần suất ký tự trả về Client.
+* **Thống kê tần suất**: Phân tích trực quan tỷ lệ xuất hiện của các ký tự trong chuỗi văn bản.
+* **Truyền tệp tin nhị phân lớn**: Hỗ trợ gửi file (hình ảnh, tài liệu, video) bằng kỹ thuật chia nhỏ 8KB (chunked streaming), chống tràn bộ nhớ (OOM).
+* **Bảo toàn dữ liệu & Chống SQL Injection**: Toàn bộ thao tác truy vấn CSDL đều dùng `PreparedStatement`.
+* **Tự động thu hồi file rác**: Server phát hiện sự cố ngắt kết nối khi đang gửi file, hủy file lỗi và cập nhật trạng thái `FAILED`.
+* **Sẵn sàng triển khai đa môi trường**: Chạy được trên cùng 1 máy (Localhost), mạng nội bộ (LAN / Máy ảo) hoặc máy chủ đám mây (Cloud VPS).
 
 ---
 
@@ -78,7 +78,7 @@ Sau khi build thành công:
 
 ---
 
-## 💻 Chạy Hệ Thống
+## Chạy Hệ Thống
 
 ### 1. Khởi động Server
 * **Cách 1 (Từ terminal/dòng lệnh):**
@@ -132,7 +132,7 @@ Tại hộp thoại kết nối:
 
 ---
 
-## 📂 Cấu Trúc Thư Mục
+## Cấu Trúc Thư Mục
 
 ```text
 CaesarChatTransfer/
