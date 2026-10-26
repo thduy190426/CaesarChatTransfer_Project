@@ -27,7 +27,7 @@ public class LoginDialog extends JDialog {
         cs.gridx = 0; cs.gridy = 1; cs.gridwidth = 1;
         panel.add(lbIp, cs);
 
-        txtIp = new JTextField("127.0.0.1", 15);
+        txtIp = new JTextField("103.20.102.126", 15);
         cs.gridx = 1; cs.gridy = 1; cs.gridwidth = 2;
         panel.add(txtIp, cs);
 
