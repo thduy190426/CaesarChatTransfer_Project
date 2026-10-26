@@ -3,6 +3,8 @@ package com.tcpchat.server.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -47,12 +49,22 @@ public class DatabaseManager {
         }
 
         Properties props = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
-            if (input != null) {
+        File externalConfig = new File("db.properties");
+        if (externalConfig.exists()) {
+            try (InputStream input = new FileInputStream(externalConfig)) {
                 props.load(input);
+                logger.info("Đã tải cấu hình database từ file ngoài: db.properties");
+            } catch (Exception e) {
+                logger.warn("Lỗi khi đọc file db.properties ngoài: {}", e.getMessage());
             }
-        } catch (Exception e) {
-            logger.warn("Không thể tải db.properties, sử dụng cấu hình mặc định: {}", e.getMessage());
+        } else {
+            try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
+                if (input != null) {
+                    props.load(input);
+                }
+            } catch (Exception e) {
+                logger.warn("Không thể tải db.properties từ classpath, sử dụng cấu hình mặc định: {}", e.getMessage());
+            }
         }
 
         this.driverClass = props.getProperty("db.driver", "com.mysql.cj.jdbc.Driver");
