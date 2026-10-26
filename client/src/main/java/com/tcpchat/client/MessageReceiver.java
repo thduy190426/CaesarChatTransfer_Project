@@ -63,13 +63,13 @@ public class MessageReceiver implements Runnable {
                         SwingUtilities.invokeLater(() -> listener.onErrorReceived(error));
                         break;
                     default:
-                        logger.warn("Loại tin nhắn không xác định: {}", type);
+                        logger.warn("Unknown message type: {}", type);
                         break;
                 }
             }
         } catch (IOException e) {
             if (isRunning) {
-                logger.error("Lỗi đọc dữ liệu từ server", e);
+                logger.error("Error reading data from server", e);
             }
         } finally {
             try {

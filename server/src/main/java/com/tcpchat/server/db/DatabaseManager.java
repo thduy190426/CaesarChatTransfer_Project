@@ -44,7 +44,7 @@ public class DatabaseManager {
     
     public synchronized void initPool() {
         if (initialized) {
-            logger.info("DatabaseManager Connection Pool đã được khởi tạo trước đó.");
+            logger.info("DatabaseManager Connection Pool already initialized.");
             return;
         }
 
@@ -53,9 +53,9 @@ public class DatabaseManager {
         if (externalConfig.exists()) {
             try (InputStream input = new FileInputStream(externalConfig)) {
                 props.load(input);
-                logger.info("Đã tải cấu hình database từ file ngoài: db.properties");
+                logger.info("Loaded database configuration from external file: db.properties");
             } catch (Exception e) {
-                logger.warn("Lỗi khi đọc file db.properties ngoài: {}", e.getMessage());
+                logger.warn("Error reading external db.properties: {}", e.getMessage());
             }
         } else {
             try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
@@ -63,7 +63,7 @@ public class DatabaseManager {
                     props.load(input);
                 }
             } catch (Exception e) {
-                logger.warn("Không thể tải db.properties từ classpath, sử dụng cấu hình mặc định: {}", e.getMessage());
+                logger.warn("Could not load db.properties from classpath, using defaults: {}", e.getMessage());
             }
         }
 

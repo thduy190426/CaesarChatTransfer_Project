@@ -32,7 +32,7 @@ public class ClientConnection {
         receiverThread.start();
         
         fileTransferClient = new FileTransferClient(out);
-        logger.info("Đã kết nối thành công tới {}:{}", host, port);
+        logger.info("Successfully connected to {}:{}", host, port);
     }
 
     public void sendKeyExchange(int key) throws IOException {
@@ -54,7 +54,7 @@ public class ClientConnection {
         try {
             send(MessageParser.toJson(pong));
         } catch (IOException e) {
-            logger.warn("Không thể gửi PONG", e);
+            logger.warn("Failed to send PONG", e);
         }
     }
 
@@ -79,9 +79,9 @@ public class ClientConnection {
             if (receiver != null) {
                 receiver.stop();
             }
-            logger.info("Đã ngắt kết nối với server");
+            logger.info("Disconnected from server");
         } catch (IOException e) {
-            logger.error("Lỗi khi đóng kết nối", e);
+            logger.error("Error closing connection", e);
         }
     }
 }

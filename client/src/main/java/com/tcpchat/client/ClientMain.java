@@ -17,7 +17,7 @@ public class ClientMain {
             
             UIManager.put("defaultFont", new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14));
         } catch (Exception e) {
-            logger.warn("Không thể thiết lập giao diện FlatLaf", e);
+            logger.warn("Failed to set FlatLaf look and feel", e);
         }
 
         SwingUtilities.invokeLater(() -> {
@@ -35,7 +35,7 @@ public class ClientMain {
                     connection.connect(ip, port, chatWindow);
                     chatWindow.setVisible(true);
                 } catch (Exception e) {
-                    logger.error("Không thể kết nối đến server", e);
+                    logger.error("Failed to connect to server", e);
                     JOptionPane.showMessageDialog(null, "Không thể kết nối tới server: " + e.getMessage(), "Lỗi kết nối", JOptionPane.ERROR_MESSAGE);
                     System.exit(1);
                 }
