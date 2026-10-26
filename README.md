@@ -29,7 +29,7 @@ Dự án được tổ chức thành 3 phân hệ Maven độc lập:
 
 ---
 
-## 🚀 Tính Năng Chính
+## Tính Năng Chính
 
 * **Mã hóa Caesar Cipher**: Mã hóa văn bản với khóa K (1 - 25) trước khi gửi qua mạng. Server giải mã, lưu DB và thống kê tần suất ký tự trả về Client.
 * **Thống kê tần suất**: Phân tích trực quan tỷ lệ xuất hiện của các ký tự trong chuỗi văn bản.
@@ -40,7 +40,7 @@ Dự án được tổ chức thành 3 phân hệ Maven độc lập:
 
 ---
 
-## 🛠️ Hướng Dẫn Cài Đặt & Vận Hành
+## Hướng Dẫn Cài Đặt & Vận Hành
 
 ### 1. Chuẩn bị môi trường
 * **Java Development Kit (JDK) 17** trở lên.
@@ -107,7 +107,7 @@ Tại hộp thoại kết nối:
 
 ---
 
-## ☁️ Triển Khai Trên Máy Ảo & Cloud VPS (Điểm Cộng)
+## Triển Khai Trên Máy Ảo & Cloud VPS (Điểm Cộng)
 
 ### Triển khai Mạng LAN / Máy ảo (VMware / VirtualBox):
 1. Cấu hình card mạng của máy ảo sang chế độ **Bridged Network** để máy ảo cùng dải IP nội bộ với máy thật.
