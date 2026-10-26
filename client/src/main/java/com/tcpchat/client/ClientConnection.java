@@ -73,8 +73,12 @@ public class ClientConnection {
 
     public void close() {
         try {
-            if (receiver != null) receiver.stop();
-            if (socket != null && !socket.isClosed()) socket.close();
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+            if (receiver != null) {
+                receiver.stop();
+            }
             logger.info("Đã ngắt kết nối với server");
         } catch (IOException e) {
             logger.error("Lỗi khi đóng kết nối", e);

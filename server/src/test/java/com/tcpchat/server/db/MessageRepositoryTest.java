@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 class MessageRepositoryTest {
 
@@ -26,7 +26,6 @@ class MessageRepositoryTest {
         dbManager.initPool(H2_URL, "sa", "", H2_DRIVER, 5);
         messageRepository = new MessageRepository(dbManager);
 
-        
         Connection conn = dbManager.getConnection();
         try (Statement stmt = conn.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS messages (" +
@@ -83,6 +82,25 @@ class MessageRepositoryTest {
     }
 
     @Test
+    @DisplayName("Lưu tin nhắn với bảng tần suất rỗng hoặc null không bị lỗi")
+    void testSaveMessageWithEmptyOrNullFrequencies() {
+        long msgId1 = messageRepository.saveMessage("10.0.0.1", "ABC", 1, "BCD", Collections.emptyMap());
+        assertTrue(msgId1 > 0);
+        assertTrue(messageRepository.getCharFrequenciesByMessageId(msgId1).isEmpty());
+
+        long msgId2 = messageRepository.saveMessage("10.0.0.2", "DEF", 2, "EFG", null);
+        assertTrue(msgId2 > 0);
+        assertTrue(messageRepository.getCharFrequenciesByMessageId(msgId2).isEmpty());
+    }
+
+    @Test
+    @DisplayName("Truy vấn tin nhắn với ID không tồn tại trả về null")
+    void testGetNonExistentMessage() {
+        assertNull(messageRepository.getMessageById(999999L));
+        assertTrue(messageRepository.getCharFrequenciesByMessageId(999999L).isEmpty());
+    }
+
+    @Test
     @DisplayName("Kiểm tra lấy danh sách toàn bộ tin nhắn")
     void testGetAllMessages() {
         messageRepository.saveMessage("10.0.0.1", "ABC", 1, "BCD", null);
@@ -90,5 +108,23 @@ class MessageRepositoryTest {
 
         var list = messageRepository.getAllMessages();
         assertEquals(2, list.size());
+    }
+
+    @Test
+    @DisplayName("An toàn trước SQL Injection trong nội dung tin nhắn và IP nhờ PreparedStatement")
+    void testSqlInjectionSafety() {
+        String maliciousPayload = "'; DROP TABLE messages; SELECT * FROM messages WHERE '1'='1";
+        String maliciousIp = "127.0.0.1' OR '1'='1";
+
+        long msgId = messageRepository.saveMessage(maliciousIp, maliciousPayload, 5, maliciousPayload, null);
+        assertTrue(msgId > 0);
+
+        MessageRepository.MessageRecord record = messageRepository.getMessageById(msgId);
+        assertNotNull(record);
+        assertEquals(maliciousPayload, record.getPlainText());
+        assertEquals(maliciousIp, record.getClientIp());
+
+        // Xác nhận cấu trúc bảng messages vẫn nguyên vẹn
+        assertNotNull(messageRepository.getAllMessages());
     }
 }

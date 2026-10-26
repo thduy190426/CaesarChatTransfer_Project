@@ -75,7 +75,7 @@ class ClientHandlerThreadTest {
 
         
         testServerSocket = new ServerSocket(0);
-        executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newCachedThreadPool();
 
         
         new File(ServerConfig.UPLOAD_DIR).mkdirs();
@@ -254,4 +254,67 @@ class ClientHandlerThreadTest {
             }
         }
     }
+
+    @Test
+    @DisplayName("KEY_EXCHANGE với khóa ngoài khoảng [1, 25] → nhận ERROR")
+    void testInvalidKeyExchange_receivesError() throws Exception {
+        try (ClientStreams client = connectClient()) {
+            Message keyMsg = new Message(Protocol.TYPE_KEY_EXCHANGE);
+            keyMsg.setKey(0); // Không hợp lệ
+            client.out.println(GSON.toJson(keyMsg));
+
+            String response = client.in.readLine();
+            assertNotNull(response);
+            assertTrue(response.contains("ERROR"), "Server phải trả về ERROR khi nhận key không hợp lệ");
+            assertTrue(response.contains("1 đến 25"));
+        }
+    }
+
+    @Test
+    @DisplayName("Client gửi PONG phản hồi Heartbeat → Server xử lý an toàn không lỗi")
+    void testPongMessage_handledSafely() throws Exception {
+        try (ClientStreams client = connectClient()) {
+            Message pongMsg = new Message(Protocol.TYPE_PONG);
+            client.out.println(GSON.toJson(pongMsg));
+
+            // Sau đó gửi tiếp KEY_EXCHANGE và TEXT để đảm bảo handler vẫn hoạt động bình thường
+            Message keyMsg = new Message(Protocol.TYPE_KEY_EXCHANGE);
+            keyMsg.setKey(3);
+            client.out.println(GSON.toJson(keyMsg));
+
+            Message textMsg = new Message(Protocol.TYPE_TEXT);
+            textMsg.setCipherText("khoor");
+            client.out.println(GSON.toJson(textMsg));
+
+            String response = client.in.readLine();
+            assertNotNull(response);
+            assertTrue(response.contains("TEXT_RESULT"));
+        }
+    }
+
+    @Test
+    @DisplayName("Client ngắt kết nối đột ngột → Server bắt IOException và dọn dẹp sạch sẽ không crash")
+    void testAbruptDisconnect_handledGracefully() throws Exception {
+        try (ClientStreams client1 = connectClient()) {
+            // Đóng socket đột ngột ngay lập tức mà không gửi PONG hay thoát đúng quy trình
+            client1.socket.close();
+        }
+        Thread.sleep(200);
+
+        // Kết nối client mới để xác nhận server vẫn phục vụ bình thường
+        try (ClientStreams client2 = connectClient()) {
+            Message keyMsg = new Message(Protocol.TYPE_KEY_EXCHANGE);
+            keyMsg.setKey(1);
+            client2.out.println(GSON.toJson(keyMsg));
+
+            Message textMsg = new Message(Protocol.TYPE_TEXT);
+            textMsg.setCipherText("bcd");
+            client2.out.println(GSON.toJson(textMsg));
+
+            String response = client2.in.readLine();
+            assertNotNull(response);
+            assertTrue(response.contains("TEXT_RESULT"));
+        }
+    }
 }
+

@@ -72,16 +72,14 @@ public class MessageReceiver implements Runnable {
                 logger.error("Lỗi đọc dữ liệu từ server", e);
             }
         } finally {
+            try {
+                reader.close();
+            } catch (IOException ignored) {}
             SwingUtilities.invokeLater(listener::onDisconnected);
         }
     }
 
     public void stop() {
         isRunning = false;
-        try {
-            reader.close();
-        } catch (IOException e) {
-            logger.error("Lỗi khi đóng luồng đọc", e);
-        }
     }
 }

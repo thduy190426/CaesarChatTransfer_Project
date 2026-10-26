@@ -10,7 +10,6 @@ import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 class FileRepositoryTest {
 
     private DatabaseManager dbManager;
@@ -64,5 +63,49 @@ class FileRepositoryTest {
 
         FileRepository.FileTransferRecord updatedRecord = fileRepository.getFileTransferById(id);
         assertEquals("DELETED", updatedRecord.getStatus());
+    }
+
+    @Test
+    @DisplayName("Truy vấn bản ghi truyền file với ID không tồn tại trả về null")
+    void testGetByNonExistentId() {
+        FileRepository.FileTransferRecord record = fileRepository.getFileTransferById(999999L);
+        assertNull(record);
+    }
+
+    @Test
+    @DisplayName("Cập nhật trạng thái cho ID không tồn tại trả về false an toàn")
+    void testUpdateNonExistentId() {
+        boolean updated = fileRepository.updateFileTransferStatus(999999L, "FAILED");
+        assertFalse(updated);
+    }
+
+    @Test
+    @DisplayName("Lưu file với mime_type là null vẫn thành công")
+    void testSaveWithNullMimeType() {
+        long id = fileRepository.saveFileTransfer("binary.dat", 2048, null, "uploads/binary.dat", "IN_PROGRESS");
+        assertTrue(id > 0);
+
+        FileRepository.FileTransferRecord record = fileRepository.getFileTransferById(id);
+        assertNotNull(record);
+        assertNull(record.getMimeType());
+        assertEquals("IN_PROGRESS", record.getStatus());
+    }
+
+    @Test
+    @DisplayName("Phòng chống SQL Injection trong fileName và savedPath nhờ PreparedStatement")
+    void testSqlInjectionSafety() {
+        String maliciousFileName = "test'; DROP TABLE file_transfers; --.txt";
+        String maliciousPath = "' OR '1'='1";
+
+        long id = fileRepository.saveFileTransfer(maliciousFileName, 500, "text/plain", maliciousPath, "SUCCESS");
+        assertTrue(id > 0);
+
+        FileRepository.FileTransferRecord record = fileRepository.getFileTransferById(id);
+        assertNotNull(record);
+        assertEquals(maliciousFileName, record.getFileName());
+        assertEquals(maliciousPath, record.getSavedPath());
+
+        // Xác nhận bảng file_transfers không hề bị drop
+        assertNotNull(fileRepository.getAllFileTransfers());
     }
 }

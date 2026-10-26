@@ -11,9 +11,9 @@ public class CaesarCipher {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            if (Character.isUpperCase(ch)) {
+            if (ch >= 'A' && ch <= 'Z') {
                 result.append((char) (((ch - 'A' + key) % 26) + 'A'));
-            } else if (Character.isLowerCase(ch)) {
+            } else if (ch >= 'a' && ch <= 'z') {
                 result.append((char) (((ch - 'a' + key) % 26) + 'a'));
             } else {
                 result.append(ch); 
@@ -22,7 +22,6 @@ public class CaesarCipher {
         return result.toString();
     }
 
-    
     public static String decrypt(String cipherText, int key) {
         validateKey(key);
         if (cipherText == null) return null;
@@ -30,9 +29,9 @@ public class CaesarCipher {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < cipherText.length(); i++) {
             char ch = cipherText.charAt(i);
-            if (Character.isUpperCase(ch)) {
+            if (ch >= 'A' && ch <= 'Z') {
                 result.append((char) (((ch - 'A' - key + 26) % 26) + 'A'));
-            } else if (Character.isLowerCase(ch)) {
+            } else if (ch >= 'a' && ch <= 'z') {
                 result.append((char) (((ch - 'a' - key + 26) % 26) + 'a'));
             } else {
                 result.append(ch);

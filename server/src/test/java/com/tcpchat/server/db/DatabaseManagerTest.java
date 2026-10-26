@@ -10,9 +10,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 class DatabaseManagerTest {
 
@@ -92,5 +92,66 @@ class DatabaseManagerTest {
         executor.shutdown();
         assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
         assertEquals(POOL_SIZE, dbManager.getAvailableConnections(), "Sau khi toàn bộ thread chạy xong, pool phải chứa lại đủ connections");
+    }
+
+    @Test
+    @DisplayName("Kiểm tra cơ chế BlockingQueue: Thread bị BLOCK khi Pool hết connection và được UNBLOCK khi có connection trả về")
+    void testPoolBlockingWhenExhausted() throws Exception {
+        // Pool có 3 connections. Lấy hết cả 3 connections:
+        Connection conn1 = dbManager.getConnection();
+        Connection conn2 = dbManager.getConnection();
+        Connection conn3 = dbManager.getConnection();
+        assertEquals(0, dbManager.getAvailableConnections(), "Pool phải hết connection");
+
+        AtomicBoolean threadGotConnection = new AtomicBoolean(false);
+        CountDownLatch threadStartedLatch = new CountDownLatch(1);
+
+        ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
+        Future<?> future = singleExecutor.submit(() -> {
+            try {
+                threadStartedLatch.countDown();
+                Connection connBlocked = dbManager.getConnection(); // Sẽ block ở đây
+                threadGotConnection.set(true);
+                dbManager.releaseConnection(connBlocked);
+            } catch (Exception e) {
+                // ignore
+            }
+        });
+
+        assertTrue(threadStartedLatch.await(2, TimeUnit.SECONDS));
+        Thread.sleep(200); // Chờ để thread chắc chắn đang bị block trong take()
+
+        assertFalse(threadGotConnection.get(), "Thread thứ 4 phải đang bị BLOCK vì pool đã cạn");
+
+        // Giải phóng 1 connection để unblock
+        dbManager.releaseConnection(conn1);
+
+        // Chờ thread lấy được connection
+        future.get(3, TimeUnit.SECONDS);
+        assertTrue(threadGotConnection.get(), "Thread thứ 4 phải được UNBLOCK sau khi có connection được trả về");
+
+        // Cleanup
+        dbManager.releaseConnection(conn2);
+        dbManager.releaseConnection(conn3);
+        singleExecutor.shutdownNow();
+    }
+
+    @Test
+    @DisplayName("Kiểm tra tự phục hồi khi trả connection đã bị đóng (Connection Auto-Healing)")
+    void testReleaseClosedConnection() throws Exception {
+        Connection conn = dbManager.getConnection();
+        conn.close(); // Đóng connection bên ngoài
+        assertTrue(conn.isClosed());
+
+        // Trả connection đã đóng vào pool
+        dbManager.releaseConnection(conn);
+
+        // Lấy lại connection tiếp theo -> DatabaseManager phải phát hiện và tạo mới kết nối hợp lệ
+        Connection newConn = dbManager.getConnection();
+        assertNotNull(newConn);
+        assertFalse(newConn.isClosed());
+        assertTrue(newConn.isValid(2));
+
+        dbManager.releaseConnection(newConn);
     }
 }
