@@ -76,7 +76,7 @@ public class ChatWindow extends JFrame implements MessageListener {
         inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0));
         
         JPanel keyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        keyPanel.add(new JLabel("Khóa Caesar (1-25): "));
+        keyPanel.add(new JLabel("Caesar Key (1-25): "));
         txtKey = new JTextField("7", 5);
         txtKey.setHorizontalAlignment(JTextField.CENTER);
         keyPanel.add(txtKey);
@@ -88,11 +88,11 @@ public class ChatWindow extends JFrame implements MessageListener {
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         
-        JButton btnSendFile = new JButton("Gửi File");
+        JButton btnSendFile = new JButton("Send File");
         btnSendFile.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnSendFile.addActionListener(e -> sendFile());
 
-        JButton btnSend = new JButton("Gửi Text");
+        JButton btnSend = new JButton("Send Text");
         btnSend.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnSend.setBackground(new Color(0, 122, 204));
         btnSend.setForeground(Color.WHITE);
@@ -137,9 +137,9 @@ public class ChatWindow extends JFrame implements MessageListener {
             txtInput.setText("");
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Khóa Caesar phải là số nguyên từ 1 đến 25", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Caesar key must be an integer between 1 and 25.", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            appendHtmlChat("<b>Lỗi hệ thống:</b>", e.getMessage(), "#d13438"); 
+            appendHtmlChat("<b>System Error:</b>", e.getMessage(), "#d13438"); 
         }
     }
 
@@ -171,9 +171,9 @@ public class ChatWindow extends JFrame implements MessageListener {
                     progressBar.setVisible(false);
                     try {
                         get(); 
-                        appendHtmlChat("<b>Hệ thống:</b>", "Đã gửi file " + file.getName() + " xong, chờ phản hồi...", "#107c10"); 
+                        appendHtmlChat("<b>System:</b>", "File " + file.getName() + " sent successfully, waiting for response...", "#107c10"); 
                     } catch (Exception e) {
-                        appendHtmlChat("<b>Lỗi gửi file:</b>", e.getMessage(), "#d13438"); 
+                        appendHtmlChat("<b>File Send Error:</b>", e.getMessage(), "#d13438"); 
                     }
                 }
             };
@@ -202,21 +202,21 @@ public class ChatWindow extends JFrame implements MessageListener {
     @Override
     public void onFileAckReceived(FilePacket ack) {
         if ("OK".equals(ack.getStatus())) {
-            appendHtmlChat("<b>Server:</b>", "Đã lưu file tại " + ack.getSavedPath(), "#107c10"); 
+            appendHtmlChat("<b>Server:</b>", "File saved at " + ack.getSavedPath(), "#107c10"); 
         } else {
-            appendHtmlChat("<b>Server (Lỗi File):</b>", ack.getStatus(), "#d13438"); 
+            appendHtmlChat("<b>Server (File Error):</b>", ack.getStatus(), "#d13438"); 
         }
     }
 
     @Override
     public void onErrorReceived(Message error) {
-        appendHtmlChat("<b>Server (Lỗi):</b>", error.getMessage(), "#d13438"); 
-        JOptionPane.showMessageDialog(this, error.getMessage(), "Lỗi từ Server", JOptionPane.ERROR_MESSAGE);
+        appendHtmlChat("<b>Server (Error):</b>", error.getMessage(), "#d13438"); 
+        JOptionPane.showMessageDialog(this, error.getMessage(), "Server Error", JOptionPane.ERROR_MESSAGE);
     }
 
     @Override
     public void onDisconnected() {
-        appendHtmlChat("<b>Hệ thống:</b>", "--- Đã ngắt kết nối khỏi server ---", "#a80000"); 
+        appendHtmlChat("<b>System:</b>", "--- Disconnected from server ---", "#a80000"); 
         txtInput.setEnabled(false);
     }
 }

@@ -12,7 +12,7 @@ public class FrequencyTablePanel extends JPanel {
     public FrequencyTablePanel() {
         setLayout(new BorderLayout());
 
-        tableModel = new DefaultTableModel(new Object[]{"Ký tự", "Số lượng"}, 0) {
+        tableModel = new DefaultTableModel(new Object[]{"Character", "Count"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -27,7 +27,7 @@ public class FrequencyTablePanel extends JPanel {
         scrollPane.setPreferredSize(new Dimension(250, 0)); 
         scrollPane.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)), 
-                "Phân tích Tần suất"));
+                "Frequency Analysis"));
 
         add(scrollPane, BorderLayout.CENTER);
     }

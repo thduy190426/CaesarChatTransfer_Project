@@ -36,7 +36,7 @@ public class ClientMain {
                     chatWindow.setVisible(true);
                 } catch (Exception e) {
                     logger.error("Failed to connect to server", e);
-                    JOptionPane.showMessageDialog(null, "Không thể kết nối tới server: " + e.getMessage(), "Lỗi kết nối", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Could not connect to server: " + e.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
                     System.exit(1);
                 }
             } else {

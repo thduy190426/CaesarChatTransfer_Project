@@ -10,7 +10,7 @@ public class LoginDialog extends JDialog {
     private boolean succeeded;
 
     public LoginDialog(JFrame parent) {
-        super(parent, "Kết nối tới Server", true);
+        super(parent, "Connect to Server", true);
         
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20)); 
@@ -18,12 +18,12 @@ public class LoginDialog extends JDialog {
         cs.fill = GridBagConstraints.HORIZONTAL;
         cs.insets = new Insets(10, 10, 10, 10); 
 
-        JLabel lbTitle = new JLabel("Kết nối Máy Chủ Caesar", SwingConstants.CENTER);
+        JLabel lbTitle = new JLabel("Caesar Server Connection", SwingConstants.CENTER);
         lbTitle.setFont(lbTitle.getFont().deriveFont(Font.BOLD, 18f));
         cs.gridx = 0; cs.gridy = 0; cs.gridwidth = 3;
         panel.add(lbTitle, cs);
 
-        JLabel lbIp = new JLabel("IP Server: ");
+        JLabel lbIp = new JLabel("Server IP: ");
         cs.gridx = 0; cs.gridy = 1; cs.gridwidth = 1;
         panel.add(lbIp, cs);
 
@@ -31,7 +31,7 @@ public class LoginDialog extends JDialog {
         cs.gridx = 1; cs.gridy = 1; cs.gridwidth = 2;
         panel.add(txtIp, cs);
 
-        JLabel lbPort = new JLabel("Cổng (Port): ");
+        JLabel lbPort = new JLabel("Port: ");
         cs.gridx = 0; cs.gridy = 2; cs.gridwidth = 1;
         panel.add(lbPort, cs);
 
@@ -39,11 +39,11 @@ public class LoginDialog extends JDialog {
         cs.gridx = 1; cs.gridy = 2; cs.gridwidth = 2;
         panel.add(txtPort, cs);
 
-        JButton btnLogin = new JButton("Kết nối");
+        JButton btnLogin = new JButton("Connect");
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogin.addActionListener(this::onConnect);
 
-        JButton btnCancel = new JButton("Hủy");
+        JButton btnCancel = new JButton("Cancel");
         btnCancel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCancel.addActionListener(e -> {
             succeeded = false;
@@ -68,7 +68,7 @@ public class LoginDialog extends JDialog {
         String portStr = txtPort.getText().trim();
 
         if (ip.isEmpty() || portStr.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ IP và Port.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter both IP and Port.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -77,7 +77,7 @@ public class LoginDialog extends JDialog {
             succeeded = true;
             dispose();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Port phải là số nguyên.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Port must be an integer.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
