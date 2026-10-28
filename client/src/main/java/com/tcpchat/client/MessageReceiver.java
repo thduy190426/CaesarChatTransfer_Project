@@ -41,30 +41,34 @@ public class MessageReceiver implements Runnable {
                 }
                 if (line.trim().isEmpty()) continue;
 
-                JsonObject json = JsonParser.parseString(line).getAsJsonObject();
-                if (!json.has("type")) continue;
-                
-                String type = json.get("type").getAsString();
-                
-                switch (type) {
-                    case Protocol.TYPE_PING:
-                        connection.sendPong();
-                        break;
-                    case Protocol.TYPE_TEXT_RESULT:
-                        TextResult textResult = MessageParser.parseTextResult(line);
-                        SwingUtilities.invokeLater(() -> listener.onTextResultReceived(textResult));
-                        break;
-                    case Protocol.TYPE_FILE_ACK:
-                        FilePacket fileAck = MessageParser.parseFilePacket(line);
-                        SwingUtilities.invokeLater(() -> listener.onFileAckReceived(fileAck));
-                        break;
-                    case Protocol.TYPE_ERROR:
-                        Message error = MessageParser.parseMessage(line);
-                        SwingUtilities.invokeLater(() -> listener.onErrorReceived(error));
-                        break;
-                    default:
-                        logger.warn("Unknown message type: {}", type);
-                        break;
+                try {
+                    JsonObject json = JsonParser.parseString(line).getAsJsonObject();
+                    if (!json.has("type")) continue;
+                    
+                    String type = json.get("type").getAsString();
+                    
+                    switch (type) {
+                        case Protocol.TYPE_PING:
+                            connection.sendPong();
+                            break;
+                        case Protocol.TYPE_TEXT_RESULT:
+                            TextResult textResult = MessageParser.parseTextResult(line);
+                            SwingUtilities.invokeLater(() -> listener.onTextResultReceived(textResult));
+                            break;
+                        case Protocol.TYPE_FILE_ACK:
+                            FilePacket fileAck = MessageParser.parseFilePacket(line);
+                            SwingUtilities.invokeLater(() -> listener.onFileAckReceived(fileAck));
+                            break;
+                        case Protocol.TYPE_ERROR:
+                            Message error = MessageParser.parseMessage(line);
+                            SwingUtilities.invokeLater(() -> listener.onErrorReceived(error));
+                            break;
+                        default:
+                            logger.warn("Unknown message type: {}", type);
+                            break;
+                    }
+                } catch (Exception e) {
+                    logger.warn("Error parsing message from server: {}", e.getMessage());
                 }
             }
         } catch (IOException e) {

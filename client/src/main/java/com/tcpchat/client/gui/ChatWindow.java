@@ -119,6 +119,11 @@ public class ChatWindow extends JFrame implements MessageListener {
 
         if (text.isEmpty()) return;
 
+        if (connection.isSendingFile()) {
+            JOptionPane.showMessageDialog(this, "A file transfer is in progress. Please wait until it completes.", "Notice", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         try {
             int key = Integer.parseInt(keyStr);
             if (key < 1 || key > 25) {
@@ -144,6 +149,10 @@ public class ChatWindow extends JFrame implements MessageListener {
     }
 
     private void sendFile() {
+        if (connection.isSendingFile()) {
+            JOptionPane.showMessageDialog(this, "A file transfer is already in progress.", "Notice", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         JFileChooser fileChooser = new JFileChooser();
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();

@@ -39,6 +39,7 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
 
     
     private volatile boolean connected = true;
+    private volatile boolean isReceivingFile = false;
     private volatile long lastPongTime;
     private Integer caesarKey = null; 
 
@@ -219,8 +220,8 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
         Path tempFile = uploadDir.resolve(tempName);
         Path finalFile = uploadDir.resolve(sanitized);
 
+        this.isReceivingFile = true;
         try {
-            
             Files.createDirectories(uploadDir);
 
             
@@ -232,6 +233,7 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
                     int toRead = (int) Math.min(buffer.length, remaining);
                     dataIn.readFully(buffer, 0, toRead);
                     fos.write(buffer, 0, toRead);
+                    this.lastPongTime = System.currentTimeMillis();
                     remaining -= toRead;
                 }
                 fos.flush();
@@ -275,6 +277,9 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
                     header.getMimeType(), null, "FAILED");
 
             sendError("File transfer failed: " + e.getMessage());
+        } finally {
+            this.isReceivingFile = false;
+            this.lastPongTime = System.currentTimeMillis();
         }
     }
 
@@ -310,6 +315,9 @@ public class ClientHandlerThread implements Runnable, HeartbeatTask.HeartbeatTar
     @Override
     public synchronized void sendMessage(String jsonLine) {
         if (!connected || writer.checkError()) {
+            return;
+        }
+        if (isReceivingFile && jsonLine.contains("\"type\":\"PING\"")) {
             return;
         }
         writer.println(jsonLine);

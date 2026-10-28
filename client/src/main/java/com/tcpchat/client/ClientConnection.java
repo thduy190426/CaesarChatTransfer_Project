@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientConnection {
     private static final Logger logger = LoggerFactory.getLogger(ClientConnection.class);
@@ -21,6 +22,7 @@ public class ClientConnection {
     private MessageReceiver receiver;
     private FileTransferClient fileTransferClient;
     private int currentKey = -1;
+    private final AtomicBoolean isSendingFile = new AtomicBoolean(false);
 
     public void connect(String host, int port, MessageListener listener) throws IOException {
         socket = new Socket(host, port);
@@ -35,6 +37,10 @@ public class ClientConnection {
         logger.info("Successfully connected to {}:{}", host, port);
     }
 
+    public boolean isSendingFile() {
+        return isSendingFile.get();
+    }
+
     public void sendKeyExchange(int key) throws IOException {
         this.currentKey = key;
         Message msg = new Message(Protocol.TYPE_KEY_EXCHANGE);
@@ -43,6 +49,9 @@ public class ClientConnection {
     }
 
     public void sendText(String cipherText) throws IOException {
+        if (isSendingFile.get()) {
+            throw new IOException("Cannot send text while file transfer is in progress");
+        }
         Message msg = new Message(Protocol.TYPE_TEXT);
         msg.setCipherText(cipherText);
         msg.setKey(currentKey);
@@ -50,6 +59,10 @@ public class ClientConnection {
     }
 
     public void sendPong() {
+        if (isSendingFile.get()) {
+            logger.debug("Skipping PONG because file transfer is in progress");
+            return;
+        }
         Message pong = new Message(Protocol.TYPE_PONG);
         try {
             send(MessageParser.toJson(pong));
@@ -60,7 +73,12 @@ public class ClientConnection {
 
     public void sendFile(File file, ProgressListener listener) throws IOException {
         if (fileTransferClient != null) {
-            fileTransferClient.sendFile(file, listener);
+            isSendingFile.set(true);
+            try {
+                fileTransferClient.sendFile(file, listener);
+            } finally {
+                isSendingFile.set(false);
+            }
         }
     }
 

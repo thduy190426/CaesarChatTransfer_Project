@@ -28,7 +28,8 @@ public class ClientHandlerThread implements Runnable {
     private InputStream in;
     private OutputStream out;
     private volatile boolean isRunning = true;
-    private long lastPongTime;
+    private volatile boolean isReceivingFile = false;
+    private volatile long lastPongTime;
     
     private final MessageRepository messageRepo;
     private final ClientRepository clientRepo;
@@ -39,6 +40,10 @@ public class ClientHandlerThread implements Runnable {
         this.lastPongTime = System.currentTimeMillis();
         this.messageRepo = new MessageRepository();
         this.clientRepo = new ClientRepository();
+    }
+
+    public void updateLastActiveTime() {
+        this.lastPongTime = System.currentTimeMillis();
     }
 
     @Override
@@ -60,31 +65,41 @@ public class ClientHandlerThread implements Runnable {
 
                 if (line.trim().isEmpty()) continue;
 
-                Message msg = MessageParser.parseMessage(line);
-                if (msg == null || msg.getType() == null) continue;
+                try {
+                    Message msg = MessageParser.parseMessage(line);
+                    if (msg == null || msg.getType() == null) continue;
 
-                switch (msg.getType()) {
-                    case Protocol.TYPE_KEY_EXCHANGE:
-                        logger.info("Nhận KEY_EXCHANGE từ {}: key={}", clientIp, msg.getKey());
-                        break;
+                    switch (msg.getType()) {
+                        case Protocol.TYPE_KEY_EXCHANGE:
+                            logger.info("Nhận KEY_EXCHANGE từ {}: key={}", clientIp, msg.getKey());
+                            break;
 
-                    case Protocol.TYPE_TEXT:
-                        handleTextMessage(clientIp, msg);
-                        break;
+                        case Protocol.TYPE_TEXT:
+                            handleTextMessage(clientIp, msg);
+                            break;
 
-                    case Protocol.TYPE_FILE:
-                        logger.info("Nhận yêu cầu chuyển file từ {}", clientIp);
-                        FileReceiverHandler fileHandler = new FileReceiverHandler(in, out, clientIp);
-                        fileHandler.receiveFile(line); 
-                        break;
+                        case Protocol.TYPE_FILE:
+                            logger.info("Nhận yêu cầu chuyển file từ {}", clientIp);
+                            isReceivingFile = true;
+                            try {
+                                FileReceiverHandler fileHandler = new FileReceiverHandler(in, out, clientIp, this);
+                                fileHandler.receiveFile(line); 
+                            } finally {
+                                isReceivingFile = false;
+                                this.lastPongTime = System.currentTimeMillis();
+                            }
+                            break;
 
-                    case Protocol.TYPE_PONG:
-                        lastPongTime = System.currentTimeMillis();
-                        break;
+                        case Protocol.TYPE_PONG:
+                            lastPongTime = System.currentTimeMillis();
+                            break;
 
-                    default:
-                        logger.warn("Không rõ loại tin nhắn: {}", msg.getType());
-                        break;
+                        default:
+                            logger.warn("Không rõ loại tin nhắn: {}", msg.getType());
+                            break;
+                    }
+                } catch (Exception e) {
+                    logger.warn("Bỏ qua tin nhắn không hợp lệ từ client {}: {}", clientIp, e.getMessage());
                 }
             }
         } catch (IOException e) {
@@ -101,16 +116,10 @@ public class ClientHandlerThread implements Runnable {
                 return;
             }
 
-            
             String plainText = CaesarCipher.decrypt(msg.getCipherText(), msg.getKey());
-            
-            
             Map<Character, Integer> freq = CharFrequencyAnalyzer.analyze(plainText);
-            
-            
             messageRepo.saveMessage(clientIp, msg.getCipherText(), msg.getKey(), plainText, freq);
 
-            
             TextResult result = new TextResult(plainText, freq);
             sendMessage(MessageParser.toJson(result));
 
@@ -121,12 +130,21 @@ public class ClientHandlerThread implements Runnable {
     }
 
     public void sendPing() {
+        if (isReceivingFile) {
+            return;
+        }
         Message ping = new Message(Protocol.TYPE_PING);
         sendMessage(MessageParser.toJson(ping));
     }
 
     public void checkAlive() {
-        
+        if (isReceivingFile) {
+            if (System.currentTimeMillis() - lastPongTime > 60000) {
+                logger.warn("Client {} bị đứng khi truyền file (>60s không có dữ liệu). Đang ngắt kết nối...", clientSocket.getInetAddress().getHostAddress());
+                cleanup(clientSocket.getInetAddress().getHostAddress());
+            }
+            return;
+        }
         if (System.currentTimeMillis() - lastPongTime > 30000) {
             logger.warn("Client {} không phản hồi Heartbeat. Đang ngắt kết nối...", clientSocket.getInetAddress().getHostAddress());
             cleanup(clientSocket.getInetAddress().getHostAddress());
@@ -165,7 +183,6 @@ public class ClientHandlerThread implements Runnable {
         logger.info("Đã ngắt kết nối với client {}", clientIp);
     }
 
-    
     private String readLineSafe(InputStream in) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int b;

@@ -3,6 +3,7 @@ package com.tcpchat.server.transfer;
 import com.tcpchat.common.MessageParser;
 import com.tcpchat.common.Protocol;
 import com.tcpchat.common.model.FilePacket;
+import com.tcpchat.server.ClientHandlerThread;
 import com.tcpchat.server.db.FileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +23,17 @@ public class FileReceiverHandler {
     private final OutputStream out;
     private final String clientIp;
     private final FileRepository fileRepo;
+    private final ClientHandlerThread parentHandler;
 
     public FileReceiverHandler(InputStream in, OutputStream out, String clientIp) {
+        this(in, out, clientIp, null);
+    }
+
+    public FileReceiverHandler(InputStream in, OutputStream out, String clientIp, ClientHandlerThread parentHandler) {
         this.in = in;
         this.out = out;
         this.clientIp = clientIp;
+        this.parentHandler = parentHandler;
         this.fileRepo = new FileRepository();
         
         File dir = new File(UPLOAD_DIR);
@@ -49,7 +56,6 @@ public class FileReceiverHandler {
         
         logger.info("Bắt đầu nhận file: {} ({} bytes)", fileName, fileSize);
 
-        
         long recordId = fileRepo.saveFileTransfer(fileName, fileSize, mimeType, saveFile.getPath(), "IN_PROGRESS");
 
         try (FileOutputStream fos = new FileOutputStream(saveFile)) {
@@ -57,7 +63,6 @@ public class FileReceiverHandler {
             long totalRead = 0;
             
             while (totalRead < fileSize) {
-                
                 int bytesToRead = (int) Math.min(buffer.length, fileSize - totalRead);
                 int read = in.read(buffer, 0, bytesToRead);
                 
@@ -67,14 +72,16 @@ public class FileReceiverHandler {
                 
                 fos.write(buffer, 0, read);
                 totalRead += read;
+
+                if (parentHandler != null) {
+                    parentHandler.updateLastActiveTime();
+                }
             }
             
             fos.flush();
             logger.info("Đã nhận hoàn tất file: {}", saveFile.getPath());
             
-            
             fileRepo.updateFileTransferStatus(recordId, "SUCCESS");
-            
             
             FilePacket ack = new FilePacket(Protocol.TYPE_FILE_ACK);
             ack.setStatus("OK");
@@ -88,7 +95,6 @@ public class FileReceiverHandler {
                 saveFile.delete();
             }
             fileRepo.updateFileTransferStatus(recordId, "FAILED");
-            
             
             FilePacket err = new FilePacket(Protocol.TYPE_ERROR);
             err.setStatus("Lỗi khi nhận file: " + e.getMessage());
