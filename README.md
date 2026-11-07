@@ -496,10 +496,7 @@ CaesarChatTransfer/
         │   │   │   ├── MessageParser.java
         │   │   │   └── TCPServer.java           # Socket Server & ThreadPool
         │   │   ├── transfer/FileReceiverHandler.java # Tiếp nhận luồng byte file
-        │   │   ├── ClientHandlerThread.java
-        │   │   ├── ServerMain.java              # Điểm khởi chạy Server
-        │   │   ├── TCPServer.java
-        │   │   └── TestDatabaseMain.java
+        │   │   └── ServerMain.java              # Điểm khởi chạy Server duy nhất
         │   └── resources/
         │       ├── db.properties                # Cấu hình kết nối MySQL
         │       └── schema.sql                   # Kịch bản DDL khởi tạo CSDL
