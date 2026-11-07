@@ -170,20 +170,11 @@ class TCPServerTest {
         int clientCount = 160; 
         Socket[] clients = new Socket[clientCount];
         
-        int successfulConnections = 0;
-        int failedConnections = 0;
-
         for (int i = 0; i < clientCount; i++) {
             try {
                 clients[i] = new Socket("localhost", port);
-                
-                Thread.sleep(5); 
-                
-                
-                
-                successfulConnections++;
-            } catch (Exception e) {
-                failedConnections++;
+                Thread.sleep(5);
+            } catch (Exception ignored) {
             }
         }
         

@@ -2,7 +2,6 @@ package com.tcpchat.client.gui;
 
 import com.tcpchat.client.ClientConnection;
 import com.tcpchat.client.MessageListener;
-import com.tcpchat.client.ProgressListener;
 import com.tcpchat.common.crypto.CaesarCipher;
 import com.tcpchat.common.model.FilePacket;
 import com.tcpchat.common.model.Message;
@@ -24,13 +23,9 @@ public class ChatWindow extends JFrame implements MessageListener {
     private FrequencyTablePanel freqPanel;
 
     private ClientConnection connection;
-    private String serverIp;
-    private int serverPort;
 
     public ChatWindow(ClientConnection connection, String ip, int port) {
         this.connection = connection;
-        this.serverIp = ip;
-        this.serverPort = port;
 
         setTitle("Caesar Chat Client - " + ip + ":" + port);
         setSize(850, 550);

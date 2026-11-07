@@ -1,6 +1,5 @@
 package com.tcpchat.client.transfer;
 
-import com.tcpchat.client.ProgressListener;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -99,14 +98,8 @@ public class FileTransferClientTest {
             raf.setLength(targetSize);
         }
 
-        // Tạo OutputStream đếm số byte gửi thay vì lưu toàn bộ vào RAM
-        OutputStream nullCountingStream = new OutputStream() {
-            long count = 0;
-            @Override
-            public void write(int b) { count++; }
-            @Override
-            public void write(byte[] b, int off, int len) { count += len; }
-        };
+        // Tạo OutputStream bỏ qua dữ liệu gửi thay vì lưu toàn bộ vào RAM
+        OutputStream nullCountingStream = OutputStream.nullOutputStream();
 
         FileTransferClient client = new FileTransferClient(nullCountingStream);
         List<Integer> progressList = new ArrayList<>();
